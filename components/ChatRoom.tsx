@@ -22,16 +22,16 @@ function Bubble({ message, mine }: { message: ChatMessage; mine: boolean }) {
   return (
     <div className={`flex ${mine ? "justify-end" : "justify-start"}`}>
       <div
-        className={`max-w-[78%] rounded-2xl px-3.5 py-2 text-[15px] leading-snug shadow-surface ${
+        className={`max-w-[78%] rounded-2xl px-3.5 py-2 text-[15px] leading-snug ${
           mine
-            ? "rounded-br-md bg-grad-gold text-kuytu-bg-deep"
-            : "rounded-bl-md border border-kuytu-border/70 bg-kuytu-card text-kuytu-text"
+            ? "rounded-br-md bg-kuytu-accent-soft text-kuytu-text"
+            : "rounded-bl-md border border-kuytu-border bg-kuytu-card-raised text-kuytu-text"
         }`}
       >
         <p className="whitespace-pre-wrap break-words">{message.content}</p>
         <span
           className={`mt-0.5 block text-right text-[10px] ${
-            mine ? "text-kuytu-bg-deep/55" : "text-kuytu-text/40"
+            mine ? "text-kuytu-text/50" : "text-kuytu-muted"
           }`}
         >
           {formatClock(message.createdAt)}
@@ -128,8 +128,8 @@ export function ChatRoom({ matchId }: { matchId: string }) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
         <WifiOff className="text-kuytu-pass" size={36} />
-        <p className="max-w-xs text-sm text-kuytu-text/60">{error}</p>
-        <Link href="/chats" className="text-sm text-kuytu-gold">
+        <p className="max-w-xs text-sm text-kuytu-muted">{error}</p>
+        <Link href="/chats" className="text-sm font-semibold text-kuytu-accent-deep">
           Sohbetlere dön
         </Link>
       </div>
@@ -139,7 +139,7 @@ export function ChatRoom({ matchId }: { matchId: string }) {
   if (!convo) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <Loader2 className="animate-spin text-kuytu-gold" size={32} />
+        <Loader2 className="animate-spin text-kuytu-accent" size={32} />
       </div>
     );
   }
@@ -147,18 +147,18 @@ export function ChatRoom({ matchId }: { matchId: string }) {
   const { profile } = convo;
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col bg-kuytu-bg">
       {/* Header */}
-      <header className="glass flex items-center gap-3 border-b border-white/[0.06] px-3 py-2.5">
+      <header className="flex items-center gap-3 border-b border-kuytu-border bg-kuytu-card px-3 py-2.5">
         <Link
           href="/chats"
           aria-label="Geri"
-          className="flex h-9 w-9 items-center justify-center rounded-full text-kuytu-text/70 transition-colors hover:text-kuytu-text"
+          className="flex h-9 w-9 items-center justify-center rounded-full text-kuytu-text transition-colors hover:text-kuytu-accent"
         >
           <ChevronLeft size={24} />
         </Link>
         <div
-          className="h-10 w-10 shrink-0 rounded-full bg-kuytu-rose/30 bg-cover bg-center ring-2 ring-kuytu-gold/40"
+          className="h-10 w-10 shrink-0 rounded-full bg-kuytu-bg-deep bg-cover bg-center ring-2 ring-kuytu-accent ring-offset-1 ring-offset-kuytu-card"
           style={{
             backgroundImage: profile.photos[0]
               ? `url(${profile.photos[0]})`
@@ -167,7 +167,7 @@ export function ChatRoom({ matchId }: { matchId: string }) {
         />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
-            <span className="truncate font-semibold text-kuytu-text">
+            <span className="truncate font-bold text-kuytu-text">
               {profile.name}
             </span>
             {profile.verified && <VerifiedBadge size={15} />}
@@ -182,10 +182,10 @@ export function ChatRoom({ matchId }: { matchId: string }) {
       <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto px-4 py-4 scroll-region">
         {convo.messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
-            <p className="font-serif text-xl text-kuytu-text">
+            <p className="text-xl font-extrabold text-kuytu-text">
               {profile.name} ile eşleştiniz
             </p>
-            <p className="max-w-xs text-sm text-kuytu-text/55">
+            <p className="max-w-xs text-sm text-kuytu-muted">
               {convo.canSend
                 ? "İlk mesajı göndererek sohbeti başlat."
                 : convo.lockReason}
@@ -199,7 +199,7 @@ export function ChatRoom({ matchId }: { matchId: string }) {
       </div>
 
       {/* Composer */}
-      <div className="glass border-t border-white/[0.06] px-3 py-2.5">
+      <div className="border-t border-kuytu-border bg-kuytu-card px-3 py-2.5">
         {convo.canSend ? (
           <form onSubmit={handleSend} className="flex items-end gap-2">
             <input
@@ -208,13 +208,13 @@ export function ChatRoom({ matchId }: { matchId: string }) {
               placeholder="Bir mesaj yaz…"
               aria-label="Mesaj"
               maxLength={2000}
-              className="min-w-0 flex-1 rounded-full border border-kuytu-border bg-kuytu-card-raised px-4 py-2.5 text-[15px] text-kuytu-text placeholder:text-kuytu-text/40 focus:border-kuytu-gold/60 focus:outline-none focus:ring-1 focus:ring-kuytu-gold/30"
+              className="min-w-0 flex-1 rounded-full border border-kuytu-border bg-kuytu-card-raised px-4 py-2.5 text-[15px] text-kuytu-text placeholder:text-kuytu-muted focus:border-kuytu-accent focus:outline-none focus:ring-1 focus:ring-kuytu-accent/40"
             />
             <button
               type="submit"
               aria-label="Gönder"
               disabled={!draft.trim() || sending}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-grad-gold text-kuytu-bg-deep shadow-glow-gold transition-[opacity,transform] active:scale-95 disabled:opacity-40 disabled:shadow-none"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-grad-gold text-kuytu-text shadow-glow-gold transition-[opacity,transform] active:scale-95 disabled:opacity-40 disabled:shadow-none"
             >
               {sending ? (
                 <Loader2 size={20} className="animate-spin" />
@@ -224,9 +224,9 @@ export function ChatRoom({ matchId }: { matchId: string }) {
             </button>
           </form>
         ) : (
-          <div className="flex items-center gap-2.5 rounded-2xl border border-kuytu-gold/20 bg-kuytu-gold/[0.06] px-4 py-3">
-            <Lock size={16} className="shrink-0 text-kuytu-gold" />
-            <p className="text-[13px] leading-snug text-kuytu-text/75">
+          <div className="flex items-center gap-2.5 rounded-2xl border border-kuytu-accent/25 bg-kuytu-accent/10 px-4 py-3">
+            <Lock size={16} className="shrink-0 text-kuytu-accent-deep" />
+            <p className="text-[13px] font-medium leading-snug text-kuytu-text/80">
               {convo.lockReason}
             </p>
           </div>

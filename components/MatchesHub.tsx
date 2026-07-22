@@ -2,31 +2,29 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Loader2, MessageSquare, Sparkles, WifiOff } from "lucide-react";
+import { ChevronRight, Loader2, Sparkles, WifiOff } from "lucide-react";
 import { fetchMatches } from "@/lib/api";
 import { formatRelativeTime } from "@/lib/time";
+import { useCountdown } from "@/lib/useCountdown";
 import type { GroupedMatches, MatchSummary } from "@/lib/types";
-import { CountdownBadge } from "./CountdownBadge";
 import { VerifiedBadge } from "./ProfileBadges";
 
-/** Circular avatar with a graceful fallback when no photo is set. */
+/** Circular avatar with a graceful fallback and optional champagne ring. */
 function Avatar({
   src,
   alt,
   size = 56,
-  glow = false,
+  ring = false,
 }: {
   src: string | null;
   alt: string;
   size?: number;
-  glow?: boolean;
+  ring?: boolean;
 }) {
   return (
     <div
-      className={`shrink-0 overflow-hidden rounded-full bg-kuytu-rose/30 bg-cover bg-center ring-2 ${
-        glow
-          ? "ring-kuytu-gold/60 shadow-[0_0_16px_-2px_rgba(229,184,128,0.55)]"
-          : "ring-kuytu-border"
+      className={`shrink-0 overflow-hidden rounded-full bg-kuytu-bg-deep bg-cover bg-center ${
+        ring ? "ring-[3px] ring-kuytu-accent ring-offset-2 ring-offset-kuytu-card" : ""
       }`}
       style={{
         width: size,
@@ -36,7 +34,7 @@ function Avatar({
       aria-label={alt}
     >
       {!src && (
-        <span className="flex h-full w-full items-center justify-center text-lg font-semibold text-kuytu-gold">
+        <span className="flex h-full w-full items-center justify-center text-lg font-bold text-kuytu-accent-deep">
           {alt.charAt(0)}
         </span>
       )}
@@ -44,39 +42,24 @@ function Avatar({
   );
 }
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="flex items-center gap-2 px-1 pb-3 font-serif text-lg font-semibold text-kuytu-text">
-      {children}
-    </h2>
-  );
-}
-
-/** Horizontal row of new matches awaiting the first move. */
-function NewMatchesRow({ matches }: { matches: MatchSummary[] }) {
+/** Horizontal "Your matches" row — new matches awaiting the first move. */
+function MatchesRow({ matches }: { matches: MatchSummary[] }) {
   return (
     <section>
-      <SectionTitle>
-        <Sparkles size={17} className="text-kuytu-gold" />
-        Yeni Eşleşmeler
-      </SectionTitle>
-      <div className="flex gap-4 overflow-x-auto pb-2 scroll-region">
+      <h2 className="pb-3 text-lg font-extrabold text-kuytu-text">
+        Eşleşmelerin
+      </h2>
+      <div className="flex gap-4 overflow-x-auto pb-1 no-scrollbar">
         {matches.map((m) => (
           <Link
             key={m.matchId}
             href={`/chats/${m.matchId}`}
-            className="flex w-[4.5rem] shrink-0 flex-col items-center gap-1.5"
+            className="flex w-[4.75rem] shrink-0 flex-col items-center gap-1.5"
           >
-            <Avatar
-              src={m.profile.photos[0] ?? null}
-              alt={m.profile.name}
-              size={66}
-              glow
-            />
-            <span className="max-w-full truncate text-xs font-medium text-kuytu-text/90">
+            <Avatar src={m.profile.photos[0] ?? null} alt={m.profile.name} size={68} ring />
+            <span className="max-w-full truncate text-xs font-semibold text-kuytu-text">
               {m.profile.name}
             </span>
-            <CountdownBadge deadline={m.expiresAt} />
           </Link>
         ))}
       </div>
@@ -84,58 +67,86 @@ function NewMatchesRow({ matches }: { matches: MatchSummary[] }) {
   );
 }
 
-/** A single conversation row. */
+/** Spotlight upsell banner (matches the reference "Be seen 10x" card). */
+function SpotlightBanner() {
+  return (
+    <button
+      type="button"
+      className="flex w-full items-center gap-3 rounded-2xl border border-kuytu-border bg-kuytu-card p-3.5 text-left shadow-soft transition-transform active:scale-[0.99]"
+    >
+      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-kuytu-accent-soft text-kuytu-text">
+        <Sparkles size={22} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-extrabold text-kuytu-text">
+          10 kat daha fazla görün
+        </span>
+        <span className="block text-sm text-kuytu-muted">
+          Spotlight ile öne çık, önce sen görün.
+        </span>
+      </span>
+      <ChevronRight size={20} className="shrink-0 text-kuytu-muted" />
+    </button>
+  );
+}
+
+/** Muted "expires in N days" line for a conversation. */
+function ExpiryNote({ deadline }: { deadline: number }) {
+  const { expired, remainingMs } = useCountdown(deadline);
+  if (expired) return <>Sohbet süresi doldu</>;
+  const days = Math.floor(remainingMs / 86_400_000);
+  const hours = Math.floor((remainingMs % 86_400_000) / 3_600_000);
+  const left = days >= 1 ? `${days} gün` : `${hours} saat`;
+  return (
+    <>
+      Sohbet <span className="font-bold text-kuytu-text">{left}</span> sonra
+      kapanır
+    </>
+  );
+}
+
+/** A single conversation list row. */
 function ConversationRow({ match }: { match: MatchSummary }) {
   const unread = match.unreadCount > 0;
-  const preview = match.lastMessage?.content ?? "Sohbeti başlatın";
+  const preview = match.lastMessage?.content ?? "Sohbeti başlat";
   return (
     <Link
       href={`/chats/${match.matchId}`}
-      className={`flex items-center gap-3 rounded-2xl border px-3 py-3 transition-all duration-200 active:scale-[0.99] ${
-        unread
-          ? "border-kuytu-gold/20 bg-kuytu-card"
-          : "border-kuytu-border/60 bg-kuytu-card/60 hover:bg-kuytu-card"
-      }`}
+      className="flex items-center gap-3.5 py-3"
     >
-      <Avatar
-        src={match.profile.photos[0] ?? null}
-        alt={match.profile.name}
-        glow={unread}
-      />
+      <Avatar src={match.profile.photos[0] ?? null} alt={match.profile.name} ring={unread} />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <span className="truncate font-semibold text-kuytu-text">
+          <span className="truncate text-lg font-extrabold text-kuytu-text">
             {match.profile.name}
           </span>
-          {match.profile.verified && <VerifiedBadge size={14} />}
+          {match.profile.verified && <VerifiedBadge size={15} />}
         </div>
         <p
-          className={`truncate text-sm ${
-            unread ? "font-medium text-kuytu-text/90" : "text-kuytu-text/50"
+          className={`truncate text-[15px] ${
+            unread ? "font-semibold text-kuytu-text" : "text-kuytu-muted"
           }`}
         >
           {preview}
         </p>
+        <p className="mt-0.5 truncate text-[13px] text-kuytu-muted">
+          {match.lastMessage ? (
+            formatRelativeTime(match.lastMessage.createdAt)
+          ) : (
+            <ExpiryNote deadline={match.expiresAt} />
+          )}
+        </p>
       </div>
-      <div className="flex flex-col items-end gap-1.5">
-        {match.lastMessage && (
-          <span className="text-[11px] text-kuytu-text/40">
-            {formatRelativeTime(match.lastMessage.createdAt)}
-          </span>
-        )}
-        {unread && (
-          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-grad-gold px-1.5 text-[11px] font-bold text-kuytu-bg-deep shadow-[0_0_12px_-2px_rgba(229,184,128,0.7)]">
-            {match.unreadCount}
-          </span>
-        )}
-      </div>
+      {unread && (
+        <span className="mt-1 h-2.5 w-2.5 shrink-0 self-start rounded-full bg-kuytu-accent" />
+      )}
     </Link>
   );
 }
 
 /**
- * The messaging hub: new matches (awaiting first move) grouped above active
- * conversations. Shared by the Eşleşmeler and Sohbetler tabs.
+ * The messaging hub: "Your matches" (new, awaiting first move) above the
+ * recent conversations list. Shared by the Eşleşmeler and Sohbetler tabs.
  */
 export function MatchesHub() {
   const [data, setData] = useState<GroupedMatches | null>(null);
@@ -155,7 +166,7 @@ export function MatchesHub() {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
         <WifiOff className="text-kuytu-pass" size={36} />
-        <p className="max-w-xs text-sm text-kuytu-text/60">{error}</p>
+        <p className="max-w-xs text-sm text-kuytu-muted">{error}</p>
       </div>
     );
   }
@@ -163,7 +174,7 @@ export function MatchesHub() {
   if (!data) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <Loader2 className="animate-spin text-kuytu-gold" size={32} />
+        <Loader2 className="animate-spin text-kuytu-accent" size={32} />
       </div>
     );
   }
@@ -172,9 +183,11 @@ export function MatchesHub() {
   if (empty) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
-        <Sparkles className="text-kuytu-gold" size={40} />
-        <h3 className="font-serif text-2xl text-kuytu-text">Henüz eşleşme yok</h3>
-        <p className="max-w-xs text-sm text-kuytu-text/60">
+        <Sparkles className="text-kuytu-accent" size={40} />
+        <h3 className="text-2xl font-extrabold text-kuytu-text">
+          Henüz eşleşme yok
+        </h3>
+        <p className="max-w-xs text-sm text-kuytu-muted">
           Keşfet&apos;te beğenmeye devam et — eşleşmelerin ve sohbetlerin burada
           toplanacak.
         </p>
@@ -183,22 +196,25 @@ export function MatchesHub() {
   }
 
   return (
-    <div className="flex flex-col gap-7 px-4 pb-6">
-      {data.newMatches.length > 0 && <NewMatchesRow matches={data.newMatches} />}
+    <div className="flex flex-col gap-6 px-5 pb-6 pt-1">
+      {data.newMatches.length > 0 ? (
+        <MatchesRow matches={data.newMatches} />
+      ) : (
+        <SpotlightBanner />
+      )}
 
       <section>
-        <SectionTitle>
-          <MessageSquare size={17} className="text-kuytu-gold" />
-          Sohbetler
-        </SectionTitle>
+        <h2 className="pb-1 text-lg font-extrabold text-kuytu-text">
+          Sohbetler <span className="text-kuytu-muted">(Son)</span>
+        </h2>
         {data.conversations.length > 0 ? (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col divide-y divide-kuytu-border">
             {data.conversations.map((m) => (
               <ConversationRow key={m.matchId} match={m} />
             ))}
           </div>
         ) : (
-          <p className="px-1 py-4 text-sm text-kuytu-text/50">
+          <p className="py-4 text-sm text-kuytu-muted">
             Henüz başlamış bir sohbet yok.
           </p>
         )}

@@ -22,12 +22,7 @@ import {
   SUPER_LIKE_THRESHOLD,
   SWIPE_FLYOUT_DISTANCE,
 } from "@/lib/constants";
-import {
-  CocukBadge,
-  InterestChip,
-  NiyetBadge,
-  VerifiedBadge,
-} from "./ProfileBadges";
+import { VerifiedBadge } from "./ProfileBadges";
 
 /** Imperative handle so parent controls (buttons) can trigger a swipe. */
 export interface SwipeCardHandle {
@@ -160,114 +155,94 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(
         }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
-        <div className="relative h-full w-full select-none overflow-hidden rounded-[1.75rem] border border-white/[0.07] bg-kuytu-card shadow-card ring-1 ring-inset ring-white/[0.04]">
-          {/* Photo (with a warm gradient fallback while it loads / if absent) */}
-          <div
-            className="absolute inset-0 bg-gradient-to-br from-kuytu-rose-deep via-kuytu-card to-kuytu-bg-deep bg-cover bg-center"
-            style={{ backgroundImage: `url(${profile.photos[photoIndex]})` }}
-            onClick={cyclePhoto}
-          />
+        <div className="flex h-full w-full select-none flex-col overflow-hidden rounded-[1.5rem] border border-kuytu-border bg-kuytu-card shadow-card">
+          {/* Photo */}
+          <div className="relative flex-1 overflow-hidden">
+            <div
+              className="absolute inset-0 bg-kuytu-bg-deep bg-cover bg-center"
+              style={{ backgroundImage: `url(${profile.photos[photoIndex]})` }}
+              onClick={cyclePhoto}
+            />
 
-          {/* Photo progress indicators */}
-          {profile.photos.length > 1 && (
-            <div className="absolute left-4 right-4 top-3 z-20 flex gap-1.5">
-              {profile.photos.map((_, i) => (
-                <span
-                  key={i}
-                  className={`h-1 flex-1 rounded-full transition-colors ${
-                    i === photoIndex
-                      ? "bg-kuytu-gold shadow-[0_0_8px_rgba(229,184,128,0.6)]"
-                      : "bg-white/25"
-                  }`}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Legibility gradient — warm, deep at the base so text pops. */}
-          <div className="absolute inset-0 bg-gradient-to-t from-kuytu-bg-deep via-kuytu-bg-deep/35 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
-
-          {/* Drag stamps */}
-          {active && (
-            <>
-              <Stamp
-                label="Beğen"
-                color="#5BBF97"
-                rotate={-14}
-                style={{ opacity: likeOpacity }}
-              />
-              <div className="absolute right-0 top-0">
-                <Stamp
-                  label="Geç"
-                  color="#E57373"
-                  rotate={14}
-                  style={{ opacity: passOpacity }}
-                />
-              </div>
-              <motion.div
-                style={{ opacity: superOpacity }}
-                className="pointer-events-none absolute inset-x-0 top-24 z-20 flex justify-center"
-              >
-                <span
-                  className="flex items-center gap-2 rounded-xl border-4 px-4 py-1.5 text-2xl font-extrabold uppercase tracking-widest"
-                  style={{ color: "#8AB4E8", borderColor: "#8AB4E8" }}
-                >
-                  <Star size={22} fill="#8AB4E8" /> Süper
-                </span>
-              </motion.div>
-            </>
-          )}
-
-          {/* Profile content — frosted panel so text reads over any photo. */}
-          <div className="absolute inset-x-0 bottom-0 z-10 p-3">
-            <div className="flex flex-col gap-3 rounded-[1.4rem] border border-white/[0.08] bg-black/25 p-4 backdrop-blur-md">
-              <div className="flex items-end justify-between gap-2">
-                <div>
-                  <h2 className="flex items-center gap-2 font-serif text-[1.9rem] font-semibold leading-tight text-kuytu-text">
-                    {profile.name}
-                    <span className="font-sans text-2xl font-light text-kuytu-text/75">
-                      {profile.age}
-                    </span>
-                    {profile.verified && <VerifiedBadge size={22} />}
-                  </h2>
-                  <p className="mt-1 flex items-center gap-1 text-sm text-kuytu-text/70">
-                    <MapPin size={13} className="text-kuytu-gold/80" />
-                    {profile.location} · {profile.distanceKm} km
-                  </p>
-                </div>
-              </div>
-
-              {/* Structured badges */}
-              <div className="flex flex-wrap gap-2">
-                <NiyetBadge niyet={profile.niyet} />
-                <CocukBadge durum={profile.cocukDurumu} />
-              </div>
-
-              {/* Bio prompt — a single highlighted prompt keeps the card calm. */}
-              {profile.prompts[0] && (
-                <div className="rounded-2xl border border-kuytu-gold/15 bg-kuytu-gold/[0.06] p-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-kuytu-gold/80">
-                    {profile.prompts[0].prompt}
-                  </p>
-                  <p className="mt-1 text-sm text-kuytu-text/90">
-                    {profile.prompts[0].answer}
-                  </p>
-                </div>
-              )}
-
-              {/* Interests */}
-              <div className="flex flex-wrap gap-1.5">
-                {profile.interests.slice(0, 4).map((tag) => (
-                  <InterestChip key={tag} label={tag} />
+            {/* Photo progress indicators */}
+            {profile.photos.length > 1 && (
+              <div className="absolute left-4 right-4 top-3 z-20 flex gap-1.5">
+                {profile.photos.map((_, i) => (
+                  <span
+                    key={i}
+                    className={`h-1 flex-1 rounded-full transition-colors ${
+                      i === photoIndex ? "bg-white" : "bg-white/40"
+                    }`}
+                  />
                 ))}
               </div>
-            </div>
+            )}
+
+            {/* Verified pill on the photo */}
+            {profile.verified && (
+              <div className="absolute left-3 top-3 z-20 flex items-center gap-1 rounded-full bg-black/45 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-md">
+                <VerifiedBadge size={14} />
+                Doğrulanmış
+              </div>
+            )}
+
+            {/* Drag stamps */}
+            {active && (
+              <>
+                <Stamp
+                  label="Beğen"
+                  color="#22B07D"
+                  rotate={-14}
+                  style={{ opacity: likeOpacity }}
+                />
+                <div className="absolute right-0 top-0">
+                  <Stamp
+                    label="Geç"
+                    color="#F0576F"
+                    rotate={14}
+                    style={{ opacity: passOpacity }}
+                  />
+                </div>
+                <motion.div
+                  style={{ opacity: superOpacity }}
+                  className="pointer-events-none absolute inset-x-0 top-24 z-20 flex justify-center"
+                >
+                  <span
+                    className="flex items-center gap-2 rounded-xl border-4 px-4 py-1.5 text-2xl font-extrabold uppercase tracking-widest"
+                    style={{ color: "#3E90E0", borderColor: "#3E90E0" }}
+                  >
+                    <Star size={22} fill="#3E90E0" /> Süper
+                  </span>
+                </motion.div>
+              </>
+            )}
           </div>
 
-          {/* Decorative Pass/Like affordance icons implied by stamps above.
-              Buttons live outside the card in ActionButtons. */}
-          <Heart className="hidden" aria-hidden />
+          {/* White footer — name / age + like affordance (image_4 style) */}
+          <div className="flex items-center justify-between gap-3 px-5 py-4">
+            <div className="min-w-0">
+              <h2 className="flex items-center gap-1.5 text-2xl font-extrabold leading-tight text-kuytu-text">
+                <span className="truncate">{profile.name}</span>
+                <span className="font-bold text-kuytu-text/80">
+                  {profile.age}
+                </span>
+              </h2>
+              <p className="mt-0.5 flex items-center gap-1 text-sm text-kuytu-muted">
+                <MapPin size={13} className="text-kuytu-accent" />
+                {profile.location} · {profile.distanceKm} km
+              </p>
+            </div>
+            {active && (
+              <button
+                type="button"
+                aria-label="Beğen"
+                onClick={() => commit("like")}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-kuytu-border text-kuytu-accent transition-colors hover:border-kuytu-accent hover:bg-kuytu-accent/10"
+              >
+                <Heart size={22} strokeWidth={2.4} />
+              </button>
+            )}
+          </div>
           <X className="hidden" aria-hidden />
         </div>
       </motion.div>

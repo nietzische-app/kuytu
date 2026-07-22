@@ -1,10 +1,14 @@
 import { MatchesHub } from "@/components/MatchesHub";
 
+/**
+ * Eşleşmeler — the same messaging hub as the Sohbetler tab (matches + recent
+ * conversations). Not in the primary nav, kept as a stable route.
+ */
 export default function MatchesPage() {
   return (
     <div className="flex flex-1 flex-col">
-      <header className="glass sticky top-0 z-30 border-b border-white/[0.05] px-4 py-3.5">
-        <h1 className="bg-grad-gold bg-clip-text font-serif text-2xl font-semibold tracking-wide text-transparent">
+      <header className="px-5 pt-4 pb-3">
+        <h1 className="text-[2rem] font-extrabold tracking-tight text-kuytu-text">
           Eşleşmeler
         </h1>
       </header>

@@ -47,7 +47,7 @@ function CircleButton({
       whileTap={{ scale: 0.86 }}
       whileHover={{ scale: 1.07, y: -2 }}
       transition={{ type: "spring", stiffness: 400, damping: 18 }}
-      className={`group relative flex ${dim} items-center justify-center rounded-full border shadow-action backdrop-blur-md transition-[box-shadow,opacity] duration-300 disabled:opacity-35 ${surface} ${glow}`}
+      className={`group relative flex ${dim} items-center justify-center rounded-full border shadow-action transition-[box-shadow,opacity] duration-300 disabled:opacity-35 ${surface} ${glow}`}
     >
       {children}
     </motion.button>
@@ -70,7 +70,7 @@ export function ActionButtons({
       <CircleButton
         label="Geri al"
         size="md"
-        surface="border-white/12 bg-kuytu-card/80 text-kuytu-gold"
+        surface="border-kuytu-border bg-kuytu-card text-kuytu-accent"
         glow="hover:shadow-glow-gold"
         onClick={() => onRewind?.()}
         disabled={disabled || !canRewind}
@@ -81,8 +81,8 @@ export function ActionButtons({
       <CircleButton
         label="Geç"
         size="lg"
-        surface="border-kuytu-pass/30 bg-kuytu-pass-bg/90 text-kuytu-pass"
-        glow="hover:shadow-[0_12px_30px_-8px_rgba(229,115,115,0.6)]"
+        surface="border-kuytu-border bg-kuytu-card text-kuytu-pass"
+        glow="hover:shadow-[0_12px_30px_-8px_rgba(240,87,111,0.45)]"
         onClick={() => onAction("pass")}
         disabled={disabled}
       >
@@ -92,8 +92,8 @@ export function ActionButtons({
       <CircleButton
         label="Süper Beğeni"
         size="md"
-        surface="border-kuytu-super/40 bg-kuytu-super-bg/90 text-kuytu-super"
-        glow="hover:shadow-[0_12px_30px_-8px_rgba(138,180,232,0.6)]"
+        surface="border-kuytu-border bg-kuytu-card text-kuytu-super"
+        glow="hover:shadow-[0_12px_30px_-8px_rgba(62,144,224,0.45)]"
         onClick={() => onAction("super")}
         disabled={disabled}
       >
@@ -103,7 +103,7 @@ export function ActionButtons({
       <CircleButton
         label="Beğen"
         size="lg"
-        surface="border-transparent bg-grad-like text-white"
+        surface="border-transparent bg-grad-gold text-white"
         glow="hover:shadow-glow-like"
         onClick={() => onAction("like")}
         disabled={disabled}

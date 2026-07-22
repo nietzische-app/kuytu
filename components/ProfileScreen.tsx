@@ -55,7 +55,7 @@ function AccountSwitcher({
             }`}
           >
             <div
-              className="h-9 w-9 shrink-0 rounded-full bg-cover bg-center ring-1 ring-white/15"
+              className="h-9 w-9 shrink-0 rounded-full bg-cover bg-center ring-1 ring-kuytu-border"
               style={{
                 backgroundImage: a.photo ? `url(${a.photo})` : undefined,
               }}
@@ -137,7 +137,7 @@ function ProfileEditor({
           {photos.map((url, i) => (
             <div
               key={`${url}-${i}`}
-              className="relative aspect-[3/4] overflow-hidden rounded-xl bg-cover bg-center ring-1 ring-white/10"
+              className="relative aspect-[3/4] overflow-hidden rounded-xl bg-cover bg-center ring-1 ring-kuytu-border"
               style={{ backgroundImage: `url(${url})` }}
             >
               <button
@@ -163,7 +163,7 @@ function ProfileEditor({
               type="button"
               onClick={addPhoto}
               aria-label="Ekle"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 text-kuytu-gold"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-kuytu-border text-kuytu-gold"
             >
               <Plus size={18} />
             </button>
@@ -221,7 +221,7 @@ function ProfileEditor({
         type="button"
         onClick={save}
         disabled={!dirty || saving}
-        className="flex items-center justify-center gap-2 rounded-full bg-grad-gold py-3.5 text-base font-semibold text-kuytu-bg-deep shadow-glow-gold transition-[opacity,transform] active:scale-[0.98] disabled:opacity-40 disabled:shadow-none"
+        className="flex items-center justify-center gap-2 rounded-full bg-grad-gold py-3.5 text-base font-semibold text-kuytu-text shadow-glow-gold transition-[opacity,transform] active:scale-[0.98] disabled:opacity-40 disabled:shadow-none"
       >
         {saving ? (
           <Loader2 size={18} className="animate-spin" />
@@ -290,7 +290,7 @@ export function ProfileScreen() {
       {/* Identity header */}
       <div className="flex items-center gap-4 pt-2">
         <div
-          className="h-20 w-20 shrink-0 rounded-full bg-cover bg-center ring-2 ring-kuytu-gold/40"
+          className="h-20 w-20 shrink-0 rounded-full bg-cover bg-center ring-2 ring-kuytu-accent ring-offset-2 ring-offset-kuytu-bg"
           style={{
             backgroundImage: me.photos[0] ? `url(${me.photos[0]})` : undefined,
           }}

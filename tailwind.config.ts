@@ -1,16 +1,14 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Kuytu design system — "Midnight Luxe".
+ * Kuytu design system — light, clean, and spacious.
  *
- * A warm, mature dark theme for the 35–55 audience. The canvas is a deep
- * charcoal velvet (never harsh pure black); surfaces are softly elevated with
- * warm borders. A single champagne rose-gold carries highlights and CTAs, with
- * a garnet wine as the intimate secondary accent. Typography pairs Playfair
- * Display (editorial serif headers) with Plus Jakarta Sans (crisp body).
+ * A bright off-white canvas with pure-white cards, soft shadows, thin light
+ * borders, sharp charcoal headers, and a single warm champagne-gold accent
+ * (active tabs, avatar rings, key badges). Typography is Plus Jakarta Sans
+ * throughout — bold for headlines, crisp for body.
  */
 const config: Config = {
-  darkMode: "class",
   content: [
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -21,93 +19,103 @@ const config: Config = {
       colors: {
         // ---- Surfaces ----
         "kuytu-bg": {
-          DEFAULT: "#111015", // Deep charcoal velvet — primary canvas
-          soft: "#16141D", // Slightly raised sections
-          deep: "#0C0B10", // Deepest wells / gradients
+          DEFAULT: "#FAFAFA", // Soft off-white canvas
+          soft: "#F4F3F1", // Slightly warm sections
+          deep: "#ECEBE8", // Wells / pressed states
         },
         "kuytu-card": {
-          DEFAULT: "#1C1A24", // Cards, sheets, list surfaces
-          raised: "#23202E", // Inputs, chips, elevated tiles
+          DEFAULT: "#FFFFFF", // Pure white cards / surfaces
+          raised: "#F7F7F8", // Inputs, chips
         },
         "kuytu-border": {
-          DEFAULT: "#2D2A38", // Warm hairline borders
-          soft: "#252231",
-        },
-
-        // ---- Accents ----
-        "kuytu-gold": {
-          DEFAULT: "#E5B880", // Champagne rose-gold — primary highlight
-          soft: "#F0CFA0",
-          deep: "#D4A373",
-        },
-        "kuytu-rose": {
-          DEFAULT: "#A33246", // Garnet wine — secondary accent
-          soft: "#C24A5E",
-          deep: "#8C2535",
+          DEFAULT: "#E5E7EB", // Thin light borders / dividers
+          soft: "#EFEFEF",
         },
 
         // ---- Text ----
         "kuytu-text": {
-          DEFAULT: "#F5F3EF", // Warm off-white — primary text
-          muted: "#9E9A93", // Soft taupe gray — secondary text
+          DEFAULT: "#18181B", // Deep charcoal — headers & primary
+          muted: "#71717A", // Neutral gray — secondary / timestamps
         },
-        "kuytu-muted": "#9E9A93",
+        "kuytu-muted": "#71717A",
+
+        // ---- Accent (champagne gold) ----
+        "kuytu-accent": {
+          DEFAULT: "#D4A373",
+          soft: "#E5B880",
+          deep: "#B8895A",
+        },
+        // Legacy alias — kuytu-gold stays the champagne accent.
+        "kuytu-gold": {
+          DEFAULT: "#D4A373",
+          soft: "#E5B880",
+          deep: "#B8895A",
+        },
 
         // ---- Semantic actions ----
         "kuytu-pass": {
-          DEFAULT: "#E57373", // Muted rose — Pass icon
-          bg: "#2A1D22", // Soft charcoal-red button field
+          DEFAULT: "#F0576F", // Rose-red — Pass
+          bg: "#FDECEF",
         },
         "kuytu-like": {
-          DEFAULT: "#5BBF97", // Warm emerald — Like icon
-          bg: "#1B2621",
+          DEFAULT: "#22B07D", // Emerald — Like
+          bg: "#E7F7F0",
         },
         "kuytu-super": {
-          DEFAULT: "#8AB4E8", // Soft periwinkle — Super Like
-          bg: "#1E2230",
+          DEFAULT: "#3E90E0", // Blue — Super Like
+          bg: "#E9F2FC",
         },
 
-        // ---- Legacy aliases (mapped to the new palette) ----
+        // ---- Legacy aliases repointed to the light palette ----
+        "kuytu-bg-deep": "#ECEBE8",
         "kuytu-black": {
-          DEFAULT: "#111015",
-          soft: "#16141D",
-          elevated: "#1C1A24",
+          DEFAULT: "#FAFAFA",
+          soft: "#F4F3F1",
+          elevated: "#FFFFFF",
+        },
+        "kuytu-rose": {
+          DEFAULT: "#D4A373",
+          soft: "#E5B880",
+          deep: "#B8895A",
         },
         "kuytu-burgundy": {
-          DEFAULT: "#A33246",
-          soft: "#C24A5E",
-          deep: "#8C2535",
+          DEFAULT: "#D4A373",
+          soft: "#E5B880",
+          deep: "#B8895A",
         },
       },
       fontFamily: {
+        // Single clean sans throughout; `serif` kept as a legacy alias so
+        // existing `font-serif` headers render in Jakarta too.
         sans: ["var(--font-jakarta)", "system-ui", "sans-serif"],
-        serif: ["var(--font-playfair)", "Georgia", "serif"],
+        serif: ["var(--font-jakarta)", "system-ui", "sans-serif"],
       },
       borderRadius: {
-        card: "1.75rem",
+        card: "1.5rem",
         "4xl": "2rem",
       },
       backgroundImage: {
-        "grad-gold": "linear-gradient(135deg, #F0CFA0 0%, #D4A373 100%)",
-        "grad-like": "linear-gradient(135deg, #E5B880 0%, #A33246 100%)",
-        "grad-rose": "linear-gradient(135deg, #A33246 0%, #8C2535 100%)",
+        "grad-gold": "linear-gradient(135deg, #E5B880 0%, #D4A373 100%)",
+        "grad-like": "linear-gradient(135deg, #E5B880 0%, #D4A373 100%)",
+        "grad-rose": "linear-gradient(135deg, #E5B880 0%, #D4A373 100%)",
         "grad-match":
-          "radial-gradient(120% 90% at 50% 0%, #3A1622 0%, #1C1A24 55%, #16141D 100%)",
-        "grad-ambient":
-          "radial-gradient(90% 60% at 50% -10%, rgba(163,50,70,0.28) 0%, rgba(17,16,21,0) 60%)",
+          "radial-gradient(120% 90% at 50% 0%, #FFF6EC 0%, #FFFFFF 55%, #FAFAFA 100%)",
+        // Soft gradient overlay for readable text on photos.
+        "photo-scrim":
+          "linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.25) 40%, rgba(0,0,0,0) 70%)",
       },
       boxShadow: {
-        // Ambient card lift
-        card: "0 28px 80px -24px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255,255,255,0.05)",
-        surface: "0 10px 30px -12px rgba(0,0,0,0.6)",
-        // Warm glows for active states / CTAs
-        "glow-gold":
-          "0 0 0 1px rgba(229,184,128,0.35), 0 10px 30px -8px rgba(229,184,128,0.35)",
-        "glow-rose": "0 10px 34px -8px rgba(163,50,70,0.55)",
-        "glow-like": "0 10px 30px -6px rgba(229,184,128,0.5)",
-        action: "0 12px 30px -10px rgba(0, 0, 0, 0.75)",
-        // Legacy alias
-        gold: "0 0 0 1px rgba(229,184,128,0.35), 0 10px 30px -8px rgba(229,184,128,0.3)",
+        // Soft, elevated card lift on a light canvas.
+        card: "0 1px 2px rgba(24,24,27,0.04), 0 10px 30px -12px rgba(24,24,27,0.16)",
+        soft: "0 1px 2px rgba(24,24,27,0.04), 0 4px 16px -8px rgba(24,24,27,0.10)",
+        surface: "0 1px 3px rgba(24,24,27,0.08)",
+        nav: "0 -1px 0 rgba(24,24,27,0.06), 0 -8px 24px -16px rgba(24,24,27,0.12)",
+        // Warm accent glow (subtle on light).
+        "glow-gold": "0 8px 22px -8px rgba(212,163,115,0.55)",
+        "glow-rose": "0 12px 30px -10px rgba(212,163,115,0.4)",
+        "glow-like": "0 8px 22px -8px rgba(212,163,115,0.55)",
+        action: "0 6px 18px -6px rgba(24,24,27,0.22)",
+        gold: "0 8px 22px -8px rgba(212,163,115,0.55)",
       },
       keyframes: {
         "fade-in": {
@@ -119,8 +127,8 @@ const config: Config = {
           "100%": { opacity: "1", transform: "scale(1)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 0 0 rgba(229,184,128,0.5)" },
-          "50%": { boxShadow: "0 0 0 6px rgba(229,184,128,0)" },
+          "0%, 100%": { boxShadow: "0 0 0 0 rgba(212,163,115,0.5)" },
+          "50%": { boxShadow: "0 0 0 6px rgba(212,163,115,0)" },
         },
         shimmer: {
           "0%": { backgroundPosition: "-200% 0" },

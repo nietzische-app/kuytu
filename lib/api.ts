@@ -44,6 +44,14 @@ export async function fetchDiscoverProfiles(): Promise<Profile[]> {
   return data.profiles;
 }
 
+/** Fetches profiles who have liked the current user (awaiting a like back). */
+export async function fetchLikedYou(): Promise<Profile[]> {
+  const res = await fetch("/api/liked-you", { cache: "no-store" });
+  if (!res.ok) throw new Error(await errorMessage(res, "Beğenenler yüklenemedi"));
+  const data = (await res.json()) as { profiles: Profile[] };
+  return data.profiles;
+}
+
 /** Records a swipe and reports whether it produced a match. */
 export async function sendSwipe(
   targetId: string,

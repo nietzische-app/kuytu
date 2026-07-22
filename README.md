@@ -33,35 +33,33 @@ Open [http://localhost:3000](http://localhost:3000) — it redirects to `/discov
 | `npm run db:studio` | Open Prisma Studio                                 |
 | `npm run gen:icons` | Regenerate the PWA icons under `public/icons/`      |
 
-## Design system — "Midnight Luxe"
+## Design system — light & spacious
 
-A warm, mature dark theme for the 35–55 audience. Defined in
-`tailwind.config.ts` and `app/globals.css`.
+A bright, clean, mature light theme (Bumble-inspired) for the 35–55 audience.
+Defined in `tailwind.config.ts` and `app/globals.css`.
 
 ### Typography (`next/font/google`)
 
-- **Playfair Display** (`font-serif`, `--font-playfair`) — brand headers,
-  titles, name badges (editorial elegance).
-- **Plus Jakarta Sans** (`font-sans`, `--font-jakarta`) — body, UI, buttons,
-  message bubbles (crisp, legible).
+- **Plus Jakarta Sans** (`--font-jakarta`) throughout — extra-bold for
+  headlines/titles, crisp for body, buttons, and message bubbles. (`font-serif`
+  is kept as a legacy alias mapped to Jakarta.)
 
 ### Color tokens
 
-| Token           | Hex       | Use                                   |
-| --------------- | --------- | ------------------------------------- |
-| `kuytu-bg`      | `#111015` | Deep charcoal velvet — canvas (`.soft` `#16141D`, `.deep` `#0C0B10`) |
-| `kuytu-card`    | `#1C1A24` | Card / surface (`.raised` `#23202E`)  |
-| `kuytu-border`  | `#2D2A38` | Warm hairline borders                 |
-| `kuytu-gold`    | `#E5B880` | Champagne rose-gold — primary accent (`.soft`/`.deep`) |
-| `kuytu-rose`    | `#A33246` | Garnet wine — secondary accent (`.soft`/`.deep`) |
-| `kuytu-text`    | `#F5F3EF` | Warm off-white (`.muted` `#9E9A93`)   |
+| Token           | Hex       | Use                                              |
+| --------------- | --------- | ------------------------------------------------ |
+| `kuytu-bg`      | `#FAFAFA` | Soft off-white canvas (`.soft` `#F4F3F1`, `.deep` `#ECEBE8`) |
+| `kuytu-card`    | `#FFFFFF` | Pure-white cards / surfaces (`.raised` `#F7F7F8`) |
+| `kuytu-border`  | `#E5E7EB` | Thin light borders / dividers                    |
+| `kuytu-text`    | `#18181B` | Deep charcoal — headers & primary (`.muted` `#71717A`) |
+| `kuytu-accent`  | `#D4A373` | Champagne gold — active tabs, rings, badges (`.soft` `#E5B880`, `.deep` `#B8895A`) |
 
-Action tokens: `kuytu-pass` (`#E57373` on `-bg #2A1D22`), `kuytu-like`
-(`#5BBF97`), `kuytu-super` (`#8AB4E8`). Gradients (`bg-grad-gold`,
-`bg-grad-like`, `bg-grad-rose`, `bg-grad-match`), warm glows (`shadow-glow-gold`,
-`shadow-glow-rose`, `shadow-glow-like`), and a `.glass` utility (frosted
-blur chrome) round out the system. Legacy `kuytu-black`/`kuytu-burgundy`
-aliases remain mapped to the new palette.
+Action tokens: `kuytu-pass` (`#F0576F`), `kuytu-like` (`#22B07D`),
+`kuytu-super` (`#3E90E0`). Soft elevation shadows (`shadow-card`, `shadow-soft`,
+`shadow-nav`), a champagne `bg-grad-gold`, a `photo-scrim` overlay, and a
+`.glass` utility round out the system. Legacy dark aliases (`kuytu-gold`,
+`kuytu-rose`, `kuytu-black`, `kuytu-burgundy`, `kuytu-bg-deep`) are repointed to
+the light palette so older class names keep working.
 
 ## Project structure
 
@@ -72,34 +70,40 @@ app/
   page.tsx                Redirects to /discover
   (app)/
     layout.tsx            Mobile shell + bottom nav
-    discover/page.tsx     Main discovery view (owns match logic)
-    matches/page.tsx      Eşleşmeler — messaging hub
-    chats/page.tsx        Sohbetler — same hub
+    discover/page.tsx     Keşfet — "recommended" card stack (image_4)
+    people/page.tsx       Kişiler — immersive full-card deck (image_3)
+    liked-you/page.tsx    Beğenenler — who liked you + Spotlight upsell (image_2)
+    chats/page.tsx        Sohbetler — matches + recent conversations (image_1)
     chats/[matchId]/      Chat screen (women-first composer)
+    matches/page.tsx      Eşleşmeler — same hub (not in nav)
     profile/page.tsx      Profil — switcher + editor
   api/
     discover/route.ts               GET nearby, unseen, compatible profiles
     swipe/route.ts                  POST a swipe; mints a Match on a mutual like
+    liked-you/route.ts              GET profiles who liked the current user
     matches/route.ts                GET grouped matches (new + conversations)
     matches/[matchId]/messages/     GET history · POST send (women-first)
     me/route.ts                     GET/PATCH the current user's profile
     auth/switch/route.ts            POST demo identity switch (sets cookie)
 components/
-  SwipeCard.tsx           Draggable profile card (Framer Motion)
+  SwipeCard.tsx           Draggable white profile card (Framer Motion)
   CardStack.tsx           Stack orchestration, rewind, empty state
-  ActionButtons.tsx       Pass / Super Like / Like buttons
+  ActionButtons.tsx       Floating Pass / Super / Like / Rewind buttons
+  PeopleDeck.tsx          Immersive full-card deck (star / heart actions)
+  LikedYou.tsx            "Liked you" grid + like-back + Spotlight upsell
   MatchModal.tsx          "Eşleşme Sağlandı!" + 48h countdown
-  MatchesHub.tsx          Grouped matches + conversations list
+  MatchesHub.tsx          Your matches row + recent conversations list
   ChatRoom.tsx            Chat screen with women-first composer lock
   CountdownBadge.tsx      Compact first-move countdown pill
   ProfileScreen.tsx       Demo switcher + bio/intention/photo editor
-  BottomNav.tsx           Keşfet · Eşleşmeler · Sohbetler · Profil
+  BottomNav.tsx           Profil · Keşfet · Kişiler · Beğenenler · Sohbetler
   ProfileBadges.tsx       Niyet / Çocuk Durumu / Doğrulanmış pills
   ComingSoon.tsx          Placeholder tab content
 lib/
   prisma.ts               PrismaClient singleton
   auth.ts                 getCurrentUser() + demo account list (MVP)
   discovery.ts            getDiscoverProfiles() — proximity feed
+  liked.ts                getUsersWhoLikedMe() — "Liked You" feed
   matching.ts             recordSwipe() — swipe + mutual-match logic
   messaging.ts            matches list, conversation, send + women-first rule
   geo.ts                  Haversine distance

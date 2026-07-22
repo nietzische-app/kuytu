@@ -2,8 +2,8 @@ import { BadgeCheck, Baby, Target } from "lucide-react";
 import type { CocukDurumu, Niyet } from "@/lib/types";
 
 /**
- * Small, high-contrast pills used across the card. Kept visually calm —
- * gold is reserved for structural (verified / intention) emphasis only.
+ * Small pills used across cards. On a light canvas they sit on translucent
+ * surfaces; over photos they use a dark scrim so they stay legible.
  */
 function Pill({
   icon,
@@ -12,16 +12,18 @@ function Pill({
 }: {
   icon: React.ReactNode;
   label: string;
-  tone?: "neutral" | "gold";
+  tone?: "neutral" | "gold" | "onPhoto";
 }) {
   const toneClasses =
     tone === "gold"
-      ? "border-kuytu-gold/40 bg-kuytu-gold/[0.12] text-kuytu-gold shadow-[0_2px_10px_-4px_rgba(229,184,128,0.4)]"
-      : "border-white/15 bg-black/35 text-kuytu-text/90";
+      ? "border-kuytu-accent/40 bg-kuytu-accent/10 text-kuytu-accent-deep"
+      : tone === "onPhoto"
+        ? "border-white/25 bg-black/35 text-white backdrop-blur-md"
+        : "border-kuytu-border bg-kuytu-card-raised text-kuytu-text/80";
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium tracking-wide backdrop-blur-md ${toneClasses}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${toneClasses}`}
     >
       {icon}
       {label}
@@ -52,16 +54,16 @@ export function VerifiedBadge({
   size?: number;
 }) {
   return (
-    <span className="inline-flex items-center gap-1 text-kuytu-gold">
+    <span className="inline-flex items-center gap-1 text-kuytu-accent">
       <BadgeCheck size={size} strokeWidth={2.5} aria-label="Doğrulanmış Profil" />
-      {showLabel && <span className="text-xs font-medium">Doğrulanmış</span>}
+      {showLabel && <span className="text-xs font-semibold">Doğrulanmış</span>}
     </span>
   );
 }
 
 export function InterestChip({ label }: { label: string }) {
   return (
-    <span className="rounded-full border border-white/10 bg-white/[0.07] px-3 py-1 text-xs text-kuytu-text/85 backdrop-blur-sm">
+    <span className="rounded-full border border-kuytu-border bg-kuytu-card-raised px-3 py-1.5 text-xs font-medium text-kuytu-text/75">
       {label}
     </span>
   );

@@ -18,14 +18,14 @@ export function CountdownBadge({
   const urgent = !parts.expired && parts.remainingMs < 6 * 3600_000;
 
   const tone = parts.expired
-    ? "border-white/12 bg-white/5 text-kuytu-text/45"
+    ? "border-kuytu-border bg-kuytu-bg-soft text-kuytu-muted"
     : urgent
-      ? "border-kuytu-rose/50 bg-kuytu-rose/15 text-kuytu-rose-soft shadow-[0_0_14px_-4px_rgba(163,50,70,0.7)]"
-      : "border-kuytu-gold/30 bg-kuytu-gold/[0.12] text-kuytu-gold";
+      ? "border-kuytu-pass/30 bg-kuytu-pass-bg text-kuytu-pass"
+      : "border-kuytu-accent/30 bg-kuytu-accent/10 text-kuytu-accent-deep";
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold tabular-nums backdrop-blur-sm ${tone} ${className}`}
+      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold tabular-nums ${tone} ${className}`}
     >
       <Clock size={11} strokeWidth={2.5} />
       {parts.expired ? "Süre doldu" : formatCountdown(parts)}
