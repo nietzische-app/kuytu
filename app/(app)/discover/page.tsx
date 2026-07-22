@@ -1,34 +1,54 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { SlidersHorizontal } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Loader2, SlidersHorizontal, WifiOff } from "lucide-react";
 import { CardStack } from "@/components/CardStack";
 import { MatchModal } from "@/components/MatchModal";
-import { mockProfiles } from "@/lib/mockData";
+import { fetchDiscoverProfiles, sendSwipe } from "@/lib/api";
 import type { Match, Profile, SwipeAction } from "@/lib/types";
 
 /**
  * /discover — the primary discovery surface.
  *
- * Owns the "did this swipe create a match?" decision and surfaces the
- * MatchModal. For the MVP a Like/Super on a woman's profile deterministically
- * mints a match so the full flow (including the 48h countdown) is demoable.
+ * Loads the feed from `GET /api/discover`, records each swipe via
+ * `POST /api/swipe`, and surfaces the MatchModal when the server reports a
+ * mutual like (with the real 48-hour first-move deadline).
  */
 export default function DiscoverPage() {
+  const [profiles, setProfiles] = useState<Profile[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [match, setMatch] = useState<Match | null>(null);
 
-  const handleSwipe = useCallback((action: SwipeAction, profile: Profile) => {
-    if (action === "pass") return;
-
-    // MVP match heuristic — replace with a real server response.
-    const isMatch = profile.gender === "kadın" || action === "super";
-    if (isMatch) {
-      setMatch({
-        id: `m-${profile.id}-${Date.now()}`,
-        profile,
-        matchedAt: Date.now(),
+  useEffect(() => {
+    let cancelled = false;
+    fetchDiscoverProfiles()
+      .then((data) => {
+        if (!cancelled) setProfiles(data);
+      })
+      .catch((err: Error) => {
+        if (!cancelled) setError(err.message);
       });
-    }
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleSwipe = useCallback((action: SwipeAction, profile: Profile) => {
+    // Fire-and-forget persistence; surface a match if the server reports one.
+    sendSwipe(profile.id, action)
+      .then((res) => {
+        if (res.matched && res.match) {
+          setMatch({
+            id: res.match.id,
+            profile: res.match.profile,
+            matchedAt: res.match.matchedAt,
+          });
+        }
+      })
+      .catch((err: Error) => {
+        // Non-fatal: the card already left the stack. Log for diagnostics.
+        console.error("Swipe failed:", err.message);
+      });
   }, []);
 
   return (
@@ -49,7 +69,21 @@ export default function DiscoverPage() {
 
       {/* Card stack fills the remaining space. */}
       <div className="relative flex-1 pb-4">
-        <CardStack profiles={mockProfiles} onSwipe={handleSwipe} />
+        {error ? (
+          <div className="flex h-full flex-col items-center justify-center gap-3 px-8 text-center">
+            <WifiOff className="text-kuytu-pass" size={36} />
+            <h3 className="font-serif text-xl text-white">
+              Bir şeyler ters gitti
+            </h3>
+            <p className="max-w-xs text-sm text-white/60">{error}</p>
+          </div>
+        ) : profiles === null ? (
+          <div className="flex h-full items-center justify-center">
+            <Loader2 className="animate-spin text-kuytu-gold" size={32} />
+          </div>
+        ) : (
+          <CardStack profiles={profiles} onSwipe={handleSwipe} />
+        )}
       </div>
 
       <MatchModal

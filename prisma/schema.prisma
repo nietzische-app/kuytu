@@ -1,0 +1,124 @@
+// Kuytu — database schema
+// PostgreSQL + Prisma. Enum values are ASCII identifiers; human-facing Turkish
+// labels (Niyet / Çocuk Durumu) are mapped in lib/mappers.ts.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Gender {
+  FEMALE
+  MALE
+}
+
+// Niyet — relationship goal.
+enum Intention {
+  SERIOUS // Ciddi İlişki
+  LONG_TERM // Uzun Vadeli
+  FRIENDSHIP // Arkadaşlık
+  UNSURE // Henüz Emin Değilim
+}
+
+// Çocuk Durumu — kids status.
+enum KidsStatus {
+  NO_KIDS // Çocuğum Yok
+  HAS_KIDS // Çocuğum Var
+  WANTS_KIDS // İstiyorum
+  NO_WANT_KIDS // İstemiyorum
+}
+
+enum SwipeDirection {
+  LIKE
+  PASS
+  SUPERLIKE
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  name         String
+  age          Int
+  gender       Gender
+  targetGender Gender
+  bio          String     @default("")
+  photos       String[]
+  isVerified   Boolean    @default(false)
+  intention    Intention
+  kidsStatus   KidsStatus
+
+  // Location — used for proximity-based discovery.
+  latitude  Float
+  longitude Float
+
+  // Display-only extras that back the discovery card UI. Not part of the
+  // core matching logic; safe to leave empty.
+  city      String? // Human-readable locality shown under the name.
+  interests String[] // Free-form interest tags.
+  prompts   Json? // Array of { prompt, answer } bio prompts.
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  swipesGiven    Swipe[]   @relation("SwipesGiven")
+  swipesReceived Swipe[]   @relation("SwipesReceived")
+  matchesAsUser1 Match[]   @relation("MatchUser1")
+  matchesAsUser2 Match[]   @relation("MatchUser2")
+  messagesSent   Message[] @relation("MessagesSent")
+
+  @@index([gender, targetGender])
+}
+
+model Swipe {
+  id        String         @id @default(cuid())
+  swiperId  String
+  targetId  String
+  direction SwipeDirection
+  createdAt DateTime       @default(now())
+
+  swiper User @relation("SwipesGiven", fields: [swiperId], references: [id], onDelete: Cascade)
+  target User @relation("SwipesReceived", fields: [targetId], references: [id], onDelete: Cascade)
+
+  // A user can only have one active swipe on a given target.
+  @@unique([swiperId, targetId])
+  // Fast reverse lookup when checking for a reciprocal like.
+  @@index([targetId, direction])
+}
+
+model Match {
+  id                 String   @id @default(cuid())
+  // user1Id/user2Id are stored in a stable order (user1Id < user2Id) so a
+  // pair can never produce two Match rows.
+  user1Id            String
+  user2Id            String
+  createdAt          DateTime @default(now())
+  // now + 48h — the women-first-move deadline.
+  expiresAt          DateTime
+  isFirstMessageSent Boolean  @default(false)
+
+  user1    User      @relation("MatchUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2    User      @relation("MatchUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  matchId   String
+  senderId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  match  Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  sender User  @relation("MessagesSent", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([matchId, createdAt])
+}

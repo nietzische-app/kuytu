@@ -1,9 +1,13 @@
 import type { Profile } from "./types";
 
 /**
- * Placeholder discovery profiles for the MVP.
+ * Seed source data.
+ *
+ * The app no longer reads this at runtime — the discovery feed now comes from
+ * the database via `GET /api/discover` (see `lib/discovery.ts`). This dataset
+ * is consumed by `prisma/seed.ts` to populate that database.
+ *
  * Photos use Unsplash portrait URLs (allow-listed in next.config.mjs).
- * Replace with a real feed once the backend exists.
  */
 export const mockProfiles: Profile[] = [
   {
