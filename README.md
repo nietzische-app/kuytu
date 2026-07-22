@@ -179,10 +179,12 @@ Switch between them on the **Profil** tab to test the women-first flow:
 
 ### Onboarding & deep profile
 
-- **Onboarding wizard** (`/onboarding`, `components/Onboarding.tsx`) — 3 steps
-  with a live completion meter: **Step 1** (mandatory, ~30s) name/age/gender/
-  target/Niyet; **Step 2** (optional, "Atla") main photo; **Step 3** (optional,
-  "Profilini Derinleştir") lifestyle chips + up to 3 icebreaker prompts.
+- **Onboarding wizard** (`/onboarding`, `components/Onboarding.tsx`) — 2 steps
+  with a live completion meter: **Step 1** (mandatory) name, age, gender, target
+  gender, Niyet, **primary photo, and height (cm)** — "Devam" is blocked until
+  all are set; **Step 2** (optional, "Şimdilik Atla") job title, education,
+  zodiac, smoking, alcohol, pets, and up to 3 icebreaker prompts. Weight is
+  never collected or stored.
 - **Enhanced profile editor** (`/profile`) — avatar with glow ring, location
   badge, a **"Profil Doluluk Oranı"** card with tips, and accordion sections:
   Temel Bilgiler, Yaşam Tarzı (quick-tap chips, auto-save), Buz Kırıcı Kartlar.

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Loader2, Sparkles } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { fetchMe, updateMe } from "@/lib/api";
 import { computeCompletion } from "@/lib/completion";
 import {
@@ -56,15 +56,22 @@ function GenderToggle({
 
 function Field({
   label,
+  hint,
   children,
 }: {
   label: string;
+  hint?: string;
   children: React.ReactNode;
 }) {
   return (
     <div>
       <label className="block pb-2 text-sm font-bold text-kuytu-text">
         {label}
+        {hint && (
+          <span className="ml-1.5 text-xs font-medium text-kuytu-muted">
+            {hint}
+          </span>
+        )}
       </label>
       {children}
     </div>
@@ -87,11 +94,11 @@ export function Onboarding() {
   const [gender, setGender] = useState<Gender | null>(null);
   const [targetGender, setTargetGender] = useState<Gender | null>(null);
   const [intention, setIntention] = useState<Niyet | null>(null);
+  const [height, setHeight] = useState("");
 
-  // Step 3 (optional)
+  // Step 2 (optional)
   const [jobTitle, setJobTitle] = useState("");
   const [education, setEducation] = useState<string | null>(null);
-  const [height, setHeight] = useState("");
   const [zodiac, setZodiac] = useState<string | null>(null);
   const [smoking, setSmoking] = useState<string | null>(null);
   const [alcohol, setAlcohol] = useState<string | null>(null);
@@ -107,9 +114,9 @@ export function Onboarding() {
         setGender(me.gender);
         setTargetGender(me.targetGender);
         setIntention(me.intention);
+        setHeight(me.height ? String(me.height) : "");
         setJobTitle(me.jobTitle ?? "");
         setEducation(me.education);
-        setHeight(me.height ? String(me.height) : "");
         setZodiac(me.zodiac);
         setSmoking(me.smoking);
         setAlcohol(me.alcohol);
@@ -138,13 +145,18 @@ export function Onboarding() {
     [me, jobTitle, education, height, zodiac, smoking, alcohol, pets, prompts],
   );
 
+  const heightNum = Number(height);
+  const heightValid = Number.isInteger(heightNum) && heightNum >= 120 && heightNum <= 230;
+  const hasPhoto = (me?.photos.length ?? 0) > 0;
   const step1Valid =
     name.trim().length > 0 &&
     Number(age) >= 18 &&
     Number(age) <= 99 &&
     gender !== null &&
     targetGender !== null &&
-    intention !== null;
+    intention !== null &&
+    heightValid &&
+    hasPhoto;
 
   async function saveStep1() {
     if (!step1Valid) return;
@@ -157,6 +169,7 @@ export function Onboarding() {
         gender: gender!,
         targetGender: targetGender!,
         intention: intention!,
+        height: heightNum,
       });
       setMe(next);
       setStep(2);
@@ -167,20 +180,21 @@ export function Onboarding() {
     }
   }
 
-  async function finish() {
+  async function finish(saveOptional: boolean) {
     setSaving(true);
     setError(null);
     try {
-      await updateMe({
-        jobTitle: jobTitle.trim() || null,
-        education,
-        height: height ? Number(height) : null,
-        zodiac,
-        smoking,
-        alcohol,
-        pets,
-        prompts,
-      });
+      if (saveOptional) {
+        await updateMe({
+          jobTitle: jobTitle.trim() || null,
+          education,
+          zodiac,
+          smoking,
+          alcohol,
+          pets,
+          prompts,
+        });
+      }
       router.push("/discover");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Kaydedilemedi");
@@ -216,7 +230,7 @@ export function Onboarding() {
             </button>
           )}
           <div className="flex flex-1 gap-1.5">
-            {[1, 2, 3].map((s) => (
+            {[1, 2].map((s) => (
               <span
                 key={s}
                 className={`h-1.5 flex-1 rounded-full transition-colors ${
@@ -239,9 +253,14 @@ export function Onboarding() {
                 Hadi başlayalım
               </h1>
               <p className="mt-1 text-sm text-kuytu-muted">
-                30 saniyede temel bilgilerini gir.
+                Devam etmek için bu temel bilgiler gerekli.
               </p>
             </div>
+
+            <Field label="Ana Fotoğraf" hint="(zorunlu)">
+              <PhotoManager photos={me.photos} onPersisted={setMe} />
+            </Field>
+
             <Field label="İsim">
               <input
                 value={name}
@@ -259,6 +278,15 @@ export function Onboarding() {
                 className={inputCls}
               />
             </Field>
+            <Field label="Boy (cm)" hint="(zorunlu)">
+              <input
+                value={height}
+                onChange={(e) => setHeight(e.target.value.replace(/\D/g, ""))}
+                inputMode="numeric"
+                placeholder="Örn: 172"
+                className={inputCls}
+              />
+            </Field>
             <Field label="Cinsiyet">
               <GenderToggle value={gender} onChange={setGender} />
             </Field>
@@ -273,25 +301,20 @@ export function Onboarding() {
                 allowClear={false}
               />
             </Field>
+
+            {!step1Valid && (name || height) && (
+              <p className="text-xs text-kuytu-muted">
+                {!hasPhoto
+                  ? "Devam etmek için bir ana fotoğraf ekle."
+                  : !heightValid
+                    ? "Geçerli bir boy gir (120–230 cm)."
+                    : "Tüm zorunlu alanları doldur."}
+              </p>
+            )}
           </div>
         )}
 
         {step === 2 && (
-          <div className="flex flex-col gap-4">
-            <div>
-              <h1 className="text-2xl font-extrabold text-kuytu-text">
-                Bir fotoğraf ekle
-              </h1>
-              <p className="mt-1 text-sm text-kuytu-muted">
-                İlk fotoğrafın ana profil fotoğrafın olur. İstersen bu adımı
-                atlayabilirsin.
-              </p>
-            </div>
-            <PhotoManager photos={me.photos} onPersisted={setMe} />
-          </div>
-        )}
-
-        {step === 3 && (
           <div className="flex flex-col gap-6">
             <div>
               <h1 className="text-2xl font-extrabold text-kuytu-text">
@@ -307,15 +330,6 @@ export function Onboarding() {
                 value={jobTitle}
                 onChange={(e) => setJobTitle(e.target.value)}
                 placeholder='Örn: "Mimarlık"'
-                className={inputCls}
-              />
-            </Field>
-            <Field label="Boy (cm)">
-              <input
-                value={height}
-                onChange={(e) => setHeight(e.target.value.replace(/\D/g, ""))}
-                inputMode="numeric"
-                placeholder="Örn: 172"
                 className={inputCls}
               />
             </Field>
@@ -361,15 +375,6 @@ export function Onboarding() {
 
       {/* Footer actions */}
       <div className="flex items-center gap-3 pt-4">
-        {step > 1 && (
-          <button
-            type="button"
-            onClick={() => (step === 3 ? finish() : setStep((s) => s + 1))}
-            className="flex-1 rounded-full border border-kuytu-border py-3.5 text-sm font-bold text-kuytu-muted transition-colors hover:text-kuytu-text"
-          >
-            Atla
-          </button>
-        )}
         {step === 1 && (
           <button
             type="button"
@@ -381,23 +386,24 @@ export function Onboarding() {
           </button>
         )}
         {step === 2 && (
-          <button
-            type="button"
-            onClick={() => setStep(3)}
-            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-grad-gold py-3.5 text-base font-bold text-kuytu-text shadow-glow-gold transition-transform active:scale-[0.98]"
-          >
-            <Sparkles size={18} /> Profilini Derinleştir
-          </button>
-        )}
-        {step === 3 && (
-          <button
-            type="button"
-            onClick={finish}
-            disabled={saving}
-            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-grad-gold py-3.5 text-base font-bold text-kuytu-text shadow-glow-gold transition-transform active:scale-[0.98] disabled:opacity-40"
-          >
-            {saving ? <Loader2 size={18} className="animate-spin" /> : "Tamamla"}
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={() => finish(false)}
+              disabled={saving}
+              className="flex-1 rounded-full border border-kuytu-border py-3.5 text-sm font-bold text-kuytu-muted transition-colors hover:text-kuytu-text disabled:opacity-40"
+            >
+              Şimdilik Atla
+            </button>
+            <button
+              type="button"
+              onClick={() => finish(true)}
+              disabled={saving}
+              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-grad-gold py-3.5 text-base font-bold text-kuytu-text shadow-glow-gold transition-transform active:scale-[0.98] disabled:opacity-40"
+            >
+              {saving ? <Loader2 size={18} className="animate-spin" /> : "Tamamla"}
+            </button>
+          </>
         )}
       </div>
     </div>
