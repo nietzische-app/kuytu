@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: theme("colors.kuytu-black.DEFAULT");
+  color: #fff;
+  /* Prevent the whole app from bouncing/scrolling like a web page — it should
+     feel like a native shell. Individual scroll regions opt back in. */
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Disable text selection on interactive chrome for an app-like feel. */
+button,
+nav {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Thin, unobtrusive scrollbars where scrolling is allowed. */
+.scroll-region {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
