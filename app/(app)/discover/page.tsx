@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Loader2, SlidersHorizontal, WifiOff } from "lucide-react";
 import { CardStack } from "@/components/CardStack";
 import { MatchModal } from "@/components/MatchModal";
-import { fetchDiscoverProfiles, sendSwipe } from "@/lib/api";
+import { fetchDiscoverProfiles, fetchMe, sendSwipe } from "@/lib/api";
 import type { Match, Profile, SwipeAction } from "@/lib/types";
 
 /**
@@ -15,9 +16,11 @@ import type { Match, Profile, SwipeAction } from "@/lib/types";
  * mutual like (with the real 48-hour first-move deadline).
  */
 export default function DiscoverPage() {
+  const router = useRouter();
   const [profiles, setProfiles] = useState<Profile[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [match, setMatch] = useState<Match | null>(null);
+  const [viewerIsWoman, setViewerIsWoman] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -27,6 +30,12 @@ export default function DiscoverPage() {
       })
       .catch((err: Error) => {
         if (!cancelled) setError(err.message);
+      });
+    // Learn the viewer's gender so the match modal is framed correctly.
+    fetchMe()
+      .then(({ me }) => !cancelled && setViewerIsWoman(me.gender === "kadın"))
+      .catch(() => {
+        /* non-fatal — defaults to the women-first framing */
       });
     return () => {
       cancelled = true;
@@ -88,12 +97,11 @@ export default function DiscoverPage() {
 
       <MatchModal
         match={match}
-        viewerIsWoman
+        viewerIsWoman={viewerIsWoman}
         onClose={() => setMatch(null)}
         onSendMessage={(m) => {
-          // Wire to the chat route once it exists.
           setMatch(null);
-          console.log("Opening chat with", m.profile.name);
+          router.push(`/chats/${m.id}`);
         }}
       />
     </div>

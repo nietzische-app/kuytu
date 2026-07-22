@@ -14,7 +14,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/discover", label: "Keşfet", icon: Flame },
-  { href: "/matches", label: "Eşleşmeler", icon: Heart, badge: 3 },
+  { href: "/matches", label: "Eşleşmeler", icon: Heart },
   { href: "/chats", label: "Sohbetler", icon: MessageSquare },
   { href: "/profile", label: "Profil", icon: User },
 ];

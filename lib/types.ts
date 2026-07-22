@@ -56,3 +56,74 @@ export interface Match {
   /** Epoch ms when the match was created — drives the 48h countdown. */
   matchedAt: number;
 }
+
+/** A single chat message, timestamps as epoch ms for easy client use. */
+export interface ChatMessage {
+  id: string;
+  matchId: string;
+  senderId: string;
+  content: string;
+  createdAt: number;
+}
+
+/** One row in the matches / conversations list. */
+export interface MatchSummary {
+  matchId: string;
+  /** The *other* participant. */
+  profile: Profile;
+  matchedAt: number;
+  /** Epoch ms deadline for the first move (matchedAt + 48h). */
+  expiresAt: number;
+  isFirstMessageSent: boolean;
+  /** Present once the conversation has any messages. */
+  lastMessage: ChatMessage | null;
+  unreadCount: number;
+}
+
+/** The two buckets the matches list is grouped into. */
+export interface GroupedMatches {
+  /** "Yeni Eşleşmeler" — matched, no first message yet. */
+  newMatches: MatchSummary[];
+  /** "Sohbetler" — conversation started. */
+  conversations: MatchSummary[];
+}
+
+/** Everything the chat screen needs to render and gate the composer. */
+export interface Conversation {
+  matchId: string;
+  /** The current viewer's id — used to align message bubbles. */
+  viewerId: string;
+  /** The other participant's profile. */
+  profile: Profile;
+  isFirstMessageSent: boolean;
+  expiresAt: number;
+  messages: ChatMessage[];
+  /** Whether the viewer may send right now (women-first rule). */
+  canSend: boolean;
+  /** Turkish explanation shown when `canSend` is false. */
+  lockReason: string | null;
+}
+
+/** The current user's own editable profile. */
+export interface MeProfile {
+  id: string;
+  name: string;
+  age: number;
+  gender: "kadın" | "erkek";
+  bio: string;
+  photos: string[];
+  /** Niyet, as the raw enum value, for the editor's select. */
+  intention: Niyet;
+  verified: boolean;
+  city: string | null;
+}
+
+/** A switchable demo identity for the MVP profile switcher. */
+export interface DemoAccount {
+  id: string;
+  name: string;
+  gender: "kadın" | "erkek";
+  photo: string | null;
+  /** True if this is the currently active identity. */
+  active: boolean;
+}

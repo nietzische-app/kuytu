@@ -1,6 +1,8 @@
 import { cookies } from "next/headers";
 import type { User } from "@prisma/client";
 import { prisma } from "./prisma";
+import { genderToLabel } from "./mappers";
+import type { DemoAccount } from "./types";
 
 /** Cookie that pins the demo viewer; set it to impersonate a seeded user. */
 export const DEMO_USER_COOKIE = "kuytu_uid";
@@ -32,4 +34,23 @@ export async function getCurrentUser(): Promise<User | null> {
   if (byEmail) return byEmail;
 
   return prisma.user.findFirst({ orderBy: { createdAt: "asc" } });
+}
+
+/**
+ * Lists the seeded accounts the MVP profile switcher can jump between, flagging
+ * whichever one is currently active. Demo/testing affordance only.
+ */
+export async function getDemoAccounts(
+  currentUserId: string | null,
+): Promise<DemoAccount[]> {
+  const users = await prisma.user.findMany({
+    orderBy: [{ gender: "asc" }, { name: "asc" }],
+  });
+  return users.map((u) => ({
+    id: u.id,
+    name: u.name,
+    gender: genderToLabel[u.gender],
+    photo: u.photos[0] ?? null,
+    active: u.id === currentUserId,
+  }));
 }

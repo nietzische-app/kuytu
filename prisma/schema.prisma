@@ -101,6 +101,10 @@ model Match {
   expiresAt          DateTime
   isFirstMessageSent Boolean  @default(false)
 
+  // Per-participant read cursors — power unread counts in the matches list.
+  user1LastReadAt DateTime?
+  user2LastReadAt DateTime?
+
   user1    User      @relation("MatchUser1", fields: [user1Id], references: [id], onDelete: Cascade)
   user2    User      @relation("MatchUser2", fields: [user2Id], references: [id], onDelete: Cascade)
   messages Message[]

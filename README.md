@@ -56,33 +56,46 @@ app/
   (app)/
     layout.tsx            Mobile shell + bottom nav
     discover/page.tsx     Main discovery view (owns match logic)
-    matches|chats|profile Placeholder tabs
+    matches/page.tsx      Eşleşmeler — messaging hub
+    chats/page.tsx        Sohbetler — same hub
+    chats/[matchId]/      Chat screen (women-first composer)
+    profile/page.tsx      Profil — switcher + editor
   api/
-    discover/route.ts     GET nearby, unseen, compatible profiles
-    swipe/route.ts        POST a swipe; mints a Match on a mutual like
+    discover/route.ts               GET nearby, unseen, compatible profiles
+    swipe/route.ts                  POST a swipe; mints a Match on a mutual like
+    matches/route.ts                GET grouped matches (new + conversations)
+    matches/[matchId]/messages/     GET history · POST send (women-first)
+    me/route.ts                     GET/PATCH the current user's profile
+    auth/switch/route.ts            POST demo identity switch (sets cookie)
 components/
   SwipeCard.tsx           Draggable profile card (Framer Motion)
   CardStack.tsx           Stack orchestration, rewind, empty state
   ActionButtons.tsx       Pass / Super Like / Like buttons
   MatchModal.tsx          "Eşleşme Sağlandı!" + 48h countdown
+  MatchesHub.tsx          Grouped matches + conversations list
+  ChatRoom.tsx            Chat screen with women-first composer lock
+  CountdownBadge.tsx      Compact first-move countdown pill
+  ProfileScreen.tsx       Demo switcher + bio/intention/photo editor
   BottomNav.tsx           Keşfet · Eşleşmeler · Sohbetler · Profil
   ProfileBadges.tsx       Niyet / Çocuk Durumu / Doğrulanmış pills
   ComingSoon.tsx          Placeholder tab content
 lib/
   prisma.ts               PrismaClient singleton
-  auth.ts                 getCurrentUser() — MVP demo-user resolver
+  auth.ts                 getCurrentUser() + demo account list (MVP)
   discovery.ts            getDiscoverProfiles() — proximity feed
   matching.ts             recordSwipe() — swipe + mutual-match logic
+  messaging.ts            matches list, conversation, send + women-first rule
   geo.ts                  Haversine distance
   mappers.ts              DB enum ↔ Turkish label mapping
-  api.ts                  Client fetch helpers (discover / swipe)
+  api.ts                  Client fetch helpers
+  time.ts                 Turkish relative timestamps
   types.ts                Domain types
   constants.ts            Swipe thresholds, 48h window
   mockData.ts             Seed source data (consumed by prisma/seed.ts)
   useCountdown.ts         Countdown hook + formatter
 prisma/
   schema.prisma           User, Swipe, Match, Message + enums
-  seed.ts                 Demo seed
+  seed.ts                 Demo seed (accounts, matches, messages)
   migrations/             SQL migrations
 scripts/
   generate-icons.mjs      Dependency-free PWA icon generator
@@ -90,14 +103,37 @@ scripts/
 
 ## API
 
-| Endpoint            | Description                                                        |
-| ------------------- | ----------------------------------------------------------------- |
-| `GET /api/discover` | Nearby, unseen, mutually-compatible profiles for the current user. Optional `?radius=<km>&limit=<n>`. |
-| `POST /api/swipe`   | Body `{ targetId, direction: "LIKE" \| "PASS" \| "SUPERLIKE" }`. On a mutual like, creates a `Match` (`expiresAt = now + 48h`) and returns it. |
+| Endpoint                            | Description                                                        |
+| ----------------------------------- | ----------------------------------------------------------------- |
+| `GET /api/discover`                 | Nearby, unseen, mutually-compatible profiles. `?radius=<km>&limit=<n>`. |
+| `POST /api/swipe`                   | `{ targetId, direction }`. Mutual like → `Match` (`expiresAt = now + 48h`). |
+| `GET /api/matches`                  | Matches grouped into `newMatches` / `conversations`, with latest message + unread count. |
+| `GET /api/matches/[matchId]/messages`  | Conversation history + first-move state + `canSend`. Marks read. |
+| `POST /api/matches/[matchId]/messages` | `{ content }`. Sends a message; the opening message flips `isFirstMessageSent`. |
+| `GET /api/me` · `PATCH /api/me`     | Read / update the current user (bio, intention, photos).          |
+| `POST /api/auth/switch`             | `{ userId }` — MVP identity switch for testing (sets `kuytu_uid`). |
 
 The "current user" is resolved by `lib/auth.ts` — an MVP stub that reads a
 `kuytu_uid` cookie, then falls back to the seeded `demo@kuytu.app`. Swap this
 for real authentication before production.
+
+### Women-first rule
+
+Enforced server-side in `lib/messaging.ts` (`canSendMessage`): anyone may reply
+once a conversation has started, but the **first** message must come from the
+woman. A man opening an unstarted chat sees a locked composer, and
+`POST …/messages` returns **403** with:
+_"Sohbeti başlatmak için karşı tarafın ilk mesajı atması bekleniyor."_
+
+### Demo accounts (seeded)
+
+Switch between them on the **Profil** tab to test the women-first flow:
+
+| Account            | Gender | State                                             |
+| ------------------ | ------ | ------------------------------------------------- |
+| `demo@kuytu.app` (Deniz) | Kadın  | New match (Kemal) + active chat (Ahmet); Murat pending like in Keşfet |
+| `kemal@kuytu.app`  | Erkek  | New match with Deniz — composer locked until she writes |
+| `ahmet@kuytu.app`  | Erkek  | Active chat with Deniz — can send                 |
 
 ## Data model
 
@@ -105,21 +141,25 @@ for real authentication before production.
   `kidsStatus` (Çocuk Durumu), `isVerified`, `latitude`/`longitude`.
 - **Swipe** — `swiperId`, `targetId`, `direction`; unique per pair.
 - **Match** — ordered `user1Id`/`user2Id` (unique pair), `expiresAt` (48h
-  window), `isFirstMessageSent`.
+  window), `isFirstMessageSent`, per-user `lastReadAt` cursors (unread counts).
 - **Message** — `matchId`, `senderId`, `content`.
 
 ## Core mechanics implemented
 
 - **Swipe & tap:** drag a card left (Geç) / right (Beğen) / up (Süper), or use
   the large bottom buttons. Tap the photo left/right to browse photos.
-- **Women first move:** `MatchModal` frames the CTA toward the woman making the
-  first move and runs a live 48-hour countdown (`FIRST_MOVE_WINDOW_MS`).
+- **Women first move:** enforced end-to-end — the `MatchModal` framing, the
+  chat composer lock, and the server (`403`) all honour it; a live 48h countdown
+  runs on `FIRST_MOVE_WINDOW_MS`.
+- **Messaging:** grouped matches list (Yeni Eşleşmeler / Sohbetler), real chat
+  history, unread counts, mark-as-read on open, and light polling for new messages.
+- **Onboarding/profile:** demo identity switcher + editable bio / intention / photos.
 - **Structured badges:** Niyet, Çocuk Durumu, and a Doğrulanmış (verified) mark.
 - **App feel:** fixed phone-width shell, bottom navigation, spring transitions.
 
 ## TODO
 
-- Replace the MVP demo-user resolver (`lib/auth.ts`) with real authentication.
-- Persist messages / enforce the women-first rule server-side when chat is built.
-- Build out Matches, Chats, and Profile tabs; add a service worker for offline.
+- Replace the MVP demo-user resolver + switcher (`lib/auth.ts`) with real auth.
+- Promote messaging to realtime (WebSocket / SSE) instead of polling.
+- Expire matches whose 48h window closes with no first message.
 - Move distance filtering into SQL (PostGIS / bounding box) as the feed grows.

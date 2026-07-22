@@ -1,10 +1,29 @@
-import type { Profile, SwipeAction } from "./types";
+import type {
+  ChatMessage,
+  Conversation,
+  DemoAccount,
+  GroupedMatches,
+  MeProfile,
+  Niyet,
+  Profile,
+  SwipeAction,
+} from "./types";
 import { actionToDirection } from "./mappers";
 
 /**
- * Thin client-side wrappers around the discovery/swipe endpoints.
+ * Thin client-side wrappers around the discovery/swipe/chat endpoints.
  * Keeping fetch details here lets components stay declarative.
  */
+
+/** Reads `{ error }` from a failed response, falling back to a default. */
+async function errorMessage(res: Response, fallback: string): Promise<string> {
+  try {
+    const data = (await res.json()) as { error?: string };
+    return data.error || fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 export interface SwipeResponse {
   matched: boolean;
@@ -39,4 +58,77 @@ export async function sendSwipe(
     throw new Error(`Swipe kaydedilemedi (${res.status})`);
   }
   return (await res.json()) as SwipeResponse;
+}
+
+// ---- Matches & chat ----
+
+/** Fetches the current user's matches, grouped into new / conversations. */
+export async function fetchMatches(): Promise<GroupedMatches> {
+  const res = await fetch("/api/matches", { cache: "no-store" });
+  if (!res.ok) throw new Error(await errorMessage(res, "Eşleşmeler yüklenemedi"));
+  return (await res.json()) as GroupedMatches;
+}
+
+/** Fetches a single conversation (and marks it read). */
+export async function fetchConversation(matchId: string): Promise<Conversation> {
+  const res = await fetch(`/api/matches/${matchId}/messages`, {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(await errorMessage(res, "Sohbet yüklenemedi"));
+  return (await res.json()) as Conversation;
+}
+
+/** Sends a message; throws with the server's reason (e.g. the women-first lock). */
+export async function postMessage(
+  matchId: string,
+  content: string,
+): Promise<ChatMessage> {
+  const res = await fetch(`/api/matches/${matchId}/messages`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content }),
+  });
+  if (!res.ok) throw new Error(await errorMessage(res, "Mesaj gönderilemedi"));
+  const data = (await res.json()) as { message: ChatMessage };
+  return data.message;
+}
+
+// ---- Profile & demo auth ----
+
+export interface MeResponse {
+  me: MeProfile;
+  accounts: DemoAccount[];
+}
+
+/** Fetches the current user's profile and the switchable demo accounts. */
+export async function fetchMe(): Promise<MeResponse> {
+  const res = await fetch("/api/me", { cache: "no-store" });
+  if (!res.ok) throw new Error(await errorMessage(res, "Profil yüklenemedi"));
+  return (await res.json()) as MeResponse;
+}
+
+/** Updates the current user's editable profile fields. */
+export async function updateMe(patch: {
+  bio?: string;
+  intention?: Niyet;
+  photos?: string[];
+}): Promise<MeProfile> {
+  const res = await fetch("/api/me", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(patch),
+  });
+  if (!res.ok) throw new Error(await errorMessage(res, "Profil güncellenemedi"));
+  const data = (await res.json()) as { me: MeProfile };
+  return data.me;
+}
+
+/** Switches the active demo identity (sets the kuytu_uid cookie). */
+export async function switchAccount(userId: string): Promise<void> {
+  const res = await fetch("/api/auth/switch", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId }),
+  });
+  if (!res.ok) throw new Error(await errorMessage(res, "Hesap değiştirilemedi"));
 }

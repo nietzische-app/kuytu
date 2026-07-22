@@ -1,14 +1,15 @@
-import { PrismaClient, type Gender, type Prisma } from "@prisma/client";
+import { PrismaClient, type Gender, type Prisma, type User } from "@prisma/client";
 import { mockProfiles } from "../lib/mockData";
 import {
   labelToGender,
   labelToKidsStatus,
   niyetToIntention,
 } from "../lib/mappers";
+import { FIRST_MOVE_WINDOW_MS } from "../lib/constants";
 
 const prisma = new PrismaClient();
 
-/** The demo "current user" the API resolves to until real auth exists. */
+/** Female demo account — the API's default "current user". */
 const DEMO_USER_EMAIL = "demo@kuytu.app";
 
 /**
@@ -26,8 +27,70 @@ const seedMeta: Record<
   p4: { email: "kemal@kuytu.app", latitude: 40.1885, longitude: 29.061 }, // Bursa
 };
 
+/** Extra men so the demo woman still has cards to discover after matching. */
+const extraMen: Prisma.UserCreateInput[] = [
+  {
+    email: "ahmet@kuytu.app",
+    name: "Ahmet",
+    age: 46,
+    gender: "MALE",
+    targetGender: "FEMALE",
+    bio: "Öğretmen. İyi kitap, iyi kahve, uzun sohbet.",
+    photos: [
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=900&q=80",
+    ],
+    isVerified: true,
+    intention: "SERIOUS",
+    kidsStatus: "HAS_KIDS",
+    city: "Moda, İstanbul",
+    latitude: 40.981,
+    longitude: 29.026,
+    interests: ["Kitap", "Bisiklet", "Tarih"],
+    prompts: [
+      { prompt: "Pazar sabahları", answer: "Sahilde bisiklet turu." },
+    ] as unknown as Prisma.InputJsonValue,
+  },
+  {
+    email: "cem@kuytu.app",
+    name: "Cem",
+    age: 40,
+    gender: "MALE",
+    targetGender: "FEMALE",
+    bio: "Müzisyen. Sahne ve deniz insanı.",
+    photos: [
+      "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=900&q=80",
+    ],
+    isVerified: false,
+    intention: "LONG_TERM",
+    kidsStatus: "NO_KIDS",
+    city: "Karaköy, İstanbul",
+    latitude: 41.025,
+    longitude: 28.978,
+    interests: ["Müzik", "Yelken", "Kahve"],
+    prompts: [
+      { prompt: "Beni anlatan", answer: "Bir gitar ve açık deniz." },
+    ] as unknown as Prisma.InputJsonValue,
+  },
+];
+
 function targetOf(gender: Gender): Gender {
   return gender === "FEMALE" ? "MALE" : "FEMALE";
+}
+
+/** Stable pair ordering — mirrors lib/matching.ts. */
+function orderPair(a: string, b: string): [string, string] {
+  return a < b ? [a, b] : [b, a];
+}
+
+/** Creates a mutual LIKE/LIKE pair of swipes between two users. */
+async function mutualLike(a: string, b: string) {
+  await prisma.swipe.createMany({
+    data: [
+      { swiperId: a, targetId: b, direction: "LIKE" },
+      { swiperId: b, targetId: a, direction: "LIKE" },
+    ],
+    skipDuplicates: true,
+  });
 }
 
 async function main() {
@@ -37,7 +100,7 @@ async function main() {
   await prisma.swipe.deleteMany();
   await prisma.user.deleteMany();
 
-  // The demo viewer — a woman looking for men, so she discovers the seeded men.
+  // The female demo viewer — looking for men, so she discovers the seeded men.
   const demo = await prisma.user.create({
     data: {
       email: DEMO_USER_EMAIL,
@@ -45,7 +108,7 @@ async function main() {
       age: 44,
       gender: "FEMALE",
       targetGender: "MALE",
-      bio: "Kuytu demo hesabı.",
+      bio: "Mimar. Denizi, iyi kahveyi ve dürüst sohbeti severim.",
       photos: [
         "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=900&q=80",
       ],
@@ -63,13 +126,11 @@ async function main() {
   });
 
   // Seed every mock profile as a real user.
-  const created = [];
+  const byEmail = new Map<string, User>();
   for (const p of mockProfiles) {
     const meta = seedMeta[p.id];
     if (!meta) continue;
     const gender = labelToGender[p.gender];
-    const prompts = p.prompts as unknown as Prisma.InputJsonValue;
-
     const user = await prisma.user.create({
       data: {
         email: meta.email,
@@ -86,23 +147,94 @@ async function main() {
         latitude: meta.latitude,
         longitude: meta.longitude,
         interests: p.interests,
-        prompts,
+        prompts: p.prompts as unknown as Prisma.InputJsonValue,
       },
     });
-    created.push(user);
+    byEmail.set(user.email, user);
   }
 
-  // Give the demo a guaranteed match: Murat has already liked her, so her
-  // first LIKE on him mints a Match (with the 48h window) immediately.
-  const murat = created.find((u) => u.email === "murat@kuytu.app");
-  if (murat) {
-    await prisma.swipe.create({
-      data: { swiperId: murat.id, targetId: demo.id, direction: "LIKE" },
+  for (const data of extraMen) {
+    const user = await prisma.user.create({ data });
+    byEmail.set(user.email, user);
+  }
+
+  const murat = byEmail.get("murat@kuytu.app")!;
+  const kemal = byEmail.get("kemal@kuytu.app")!;
+  const ahmet = byEmail.get("ahmet@kuytu.app")!;
+
+  // 1) Pending like — Murat has liked Deniz but no match yet, so her first LIKE
+  //    on him in /discover mints a Match live.
+  await prisma.swipe.create({
+    data: { swiperId: murat.id, targetId: demo.id, direction: "LIKE" },
+  });
+
+  // 2) New match awaiting first move — Kemal ↔ Deniz, no message yet. Drives the
+  //    women-first rule: Deniz (female) may open; Kemal (male) must wait.
+  await mutualLike(demo.id, kemal.id);
+  {
+    const [u1, u2] = orderPair(demo.id, kemal.id);
+    await prisma.match.create({
+      data: {
+        user1Id: u1,
+        user2Id: u2,
+        // ~40h left on the 48h window.
+        expiresAt: new Date(Date.now() + FIRST_MOVE_WINDOW_MS - 8 * 3600_000),
+        isFirstMessageSent: false,
+      },
     });
   }
 
+  // 3) Active chat — Ahmet ↔ Deniz, first message already sent (by Deniz), with
+  //    a short history. Ahmet's latest reply is unread by Deniz.
+  await mutualLike(demo.id, ahmet.id);
+  {
+    const [u1, u2] = orderPair(demo.id, ahmet.id);
+    const now = Date.now();
+    const match = await prisma.match.create({
+      data: {
+        user1Id: u1,
+        user2Id: u2,
+        expiresAt: new Date(now + FIRST_MOVE_WINDOW_MS),
+        isFirstMessageSent: true,
+        // Deniz last read right after her own last message; Ahmet replied after.
+        user1LastReadAt: u1 === demo.id ? new Date(now - 30 * 60_000) : null,
+        user2LastReadAt: u2 === demo.id ? new Date(now - 30 * 60_000) : null,
+      },
+    });
+    await prisma.message.createMany({
+      data: [
+        {
+          matchId: match.id,
+          senderId: demo.id,
+          content: "Merhaba Ahmet, profilindeki kitap seçkisi çok iyiymiş.",
+          createdAt: new Date(now - 60 * 60_000),
+        },
+        {
+          matchId: match.id,
+          senderId: ahmet.id,
+          content: "Teşekkürler Deniz! En son ne okudun?",
+          createdAt: new Date(now - 50 * 60_000),
+        },
+        {
+          matchId: match.id,
+          senderId: demo.id,
+          content: "Şu an bir Sait Faik cildindeyim, çok iyi gidiyor.",
+          createdAt: new Date(now - 40 * 60_000),
+        },
+        {
+          matchId: match.id,
+          senderId: ahmet.id,
+          content: "Harika seçim. Cumartesi bir kahve içelim mi?",
+          createdAt: new Date(now - 10 * 60_000), // after Deniz's last read
+        },
+      ],
+    });
+  }
+
+  const total = byEmail.size + 1;
   console.log(
-    `Seeded ${created.length + 1} users (demo: ${demo.email}) and 1 pending like.`,
+    `Seeded ${total} users. Demo accounts: ${DEMO_USER_EMAIL} (Female), ` +
+      `kemal@kuytu.app (Male, new match), ahmet@kuytu.app (Male, active chat).`,
   );
 }
 

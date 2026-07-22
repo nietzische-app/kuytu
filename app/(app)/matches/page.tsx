@@ -1,12 +1,14 @@
-import { Heart } from "lucide-react";
-import { ComingSoon } from "@/components/ComingSoon";
+import { MatchesHub } from "@/components/MatchesHub";
 
 export default function MatchesPage() {
   return (
-    <ComingSoon
-      icon={Heart}
-      title="Eşleşmeler"
-      subtitle="Eşleştiğin profiller ve 48 saatlik ilk mesaj süreleri yakında burada."
-    />
+    <div className="flex flex-1 flex-col">
+      <header className="px-4 py-4">
+        <h1 className="font-serif text-2xl font-semibold tracking-wide text-kuytu-gold">
+          Eşleşmeler
+        </h1>
+      </header>
+      <MatchesHub />
+    </div>
   );
 }
