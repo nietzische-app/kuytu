@@ -12,12 +12,23 @@ body {
 }
 
 body {
-  background-color: theme("colors.kuytu-black.DEFAULT");
-  color: #fff;
+  /* Deep charcoal velvet with a faint warm ambient glow from the top. */
+  background-color: theme("colors.kuytu-bg.DEFAULT");
+  background-image: theme("backgroundImage.grad-ambient");
+  background-attachment: fixed;
+  color: theme("colors.kuytu-text.DEFAULT");
+  font-feature-settings: "ss01", "cv01";
   /* Prevent the whole app from bouncing/scrolling like a web page — it should
      feel like a native shell. Individual scroll regions opt back in. */
   overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+}
+
+/* Warm champagne text selection. */
+::selection {
+  background: rgba(229, 184, 128, 0.28);
+  color: #fff;
 }
 
 /* Disable text selection on interactive chrome for an app-like feel. */
@@ -31,5 +42,20 @@ nav {
 .scroll-region {
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+  scrollbar-color: rgba(229, 184, 128, 0.18) transparent;
+}
+.scroll-region::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scroll-region::-webkit-scrollbar-thumb {
+  background: rgba(229, 184, 128, 0.18);
+  border-radius: 9999px;
+}
+
+/* Utility: frosted glass chrome (headers, bottom nav). */
+.glass {
+  background: rgba(17, 16, 21, 0.72);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
 }

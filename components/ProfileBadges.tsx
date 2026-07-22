@@ -16,12 +16,12 @@ function Pill({
 }) {
   const toneClasses =
     tone === "gold"
-      ? "border-kuytu-gold/40 bg-kuytu-gold/10 text-kuytu-gold"
-      : "border-white/15 bg-black/30 text-white/90";
+      ? "border-kuytu-gold/40 bg-kuytu-gold/[0.12] text-kuytu-gold shadow-[0_2px_10px_-4px_rgba(229,184,128,0.4)]"
+      : "border-white/15 bg-black/35 text-kuytu-text/90";
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium backdrop-blur-sm ${toneClasses}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium tracking-wide backdrop-blur-md ${toneClasses}`}
     >
       {icon}
       {label}
@@ -61,7 +61,7 @@ export function VerifiedBadge({
 
 export function InterestChip({ label }: { label: string }) {
   return (
-    <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs text-white/80">
+    <span className="rounded-full border border-white/10 bg-white/[0.07] px-3 py-1 text-xs text-kuytu-text/85 backdrop-blur-sm">
       {label}
     </span>
   );

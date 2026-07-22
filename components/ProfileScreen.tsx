@@ -32,12 +32,12 @@ function AccountSwitcher({
   switching: string | null;
 }) {
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-      <h2 className="flex items-center gap-2 pb-1 text-sm font-semibold text-white">
+    <section className="rounded-2xl border border-kuytu-border bg-kuytu-card p-4">
+      <h2 className="flex items-center gap-2 pb-1 text-sm font-semibold text-kuytu-text">
         <UserCog size={16} className="text-kuytu-gold" />
         Test hesabı değiştir
       </h2>
-      <p className="pb-3 text-xs text-white/50">
+      <p className="pb-3 text-xs text-kuytu-text/50">
         Kadın ve erkek hesaplar arasında geçiş yaparak &quot;önce kadın&quot;
         kuralını test edin.
       </p>
@@ -50,8 +50,8 @@ function AccountSwitcher({
             onClick={() => onSwitch(a.id)}
             className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-left transition-colors ${
               a.active
-                ? "border-kuytu-gold/40 bg-kuytu-gold/10"
-                : "border-white/10 hover:bg-white/[0.05]"
+                ? "border-kuytu-gold/40 bg-kuytu-gold/[0.12] shadow-[0_0_16px_-6px_rgba(229,184,128,0.6)]"
+                : "border-kuytu-border/70 bg-kuytu-card-raised/40 hover:bg-kuytu-card-raised"
             }`}
           >
             <div
@@ -61,8 +61,8 @@ function AccountSwitcher({
               }}
             />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-white">{a.name}</p>
-              <p className="text-xs text-white/50">
+              <p className="truncate text-sm font-medium text-kuytu-text">{a.name}</p>
+              <p className="text-xs text-kuytu-text/50">
                 {a.gender === "kadın" ? "Kadın" : "Erkek"}
               </p>
             </div>
@@ -73,7 +73,7 @@ function AccountSwitcher({
                 Aktif
               </span>
             ) : (
-              <RefreshCw size={15} className="text-white/40" />
+              <RefreshCw size={15} className="text-kuytu-text/40" />
             )}
           </button>
         ))}
@@ -130,7 +130,7 @@ function ProfileEditor({
     <section className="flex flex-col gap-5">
       {/* Photos */}
       <div>
-        <label className="pb-2 block text-sm font-semibold text-white">
+        <label className="pb-2 block text-sm font-semibold text-kuytu-text">
           Fotoğraflar
         </label>
         <div className="grid grid-cols-3 gap-2">
@@ -144,7 +144,7 @@ function ProfileEditor({
                 type="button"
                 aria-label="Fotoğrafı kaldır"
                 onClick={() => setPhotos((p) => p.filter((_, idx) => idx !== i))}
-                className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white"
+                className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-kuytu-text"
               >
                 <Trash2 size={13} />
               </button>
@@ -157,7 +157,7 @@ function ProfileEditor({
               value={newPhoto}
               onChange={(e) => setNewPhoto(e.target.value)}
               placeholder="Fotoğraf URL'si ekle"
-              className="min-w-0 flex-1 rounded-xl border border-white/10 bg-kuytu-black-elevated px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-kuytu-gold/50 focus:outline-none"
+              className="min-w-0 flex-1 rounded-xl border border-kuytu-border bg-kuytu-card-raised px-3 py-2 text-sm text-kuytu-text placeholder:text-kuytu-text/40 focus:border-kuytu-gold/60 focus:outline-none focus:ring-1 focus:ring-kuytu-gold/25"
             />
             <button
               type="button"
@@ -175,7 +175,7 @@ function ProfileEditor({
       <div>
         <label
           htmlFor="intention"
-          className="pb-2 block text-sm font-semibold text-white"
+          className="pb-2 block text-sm font-semibold text-kuytu-text"
         >
           Niyet
         </label>
@@ -183,7 +183,7 @@ function ProfileEditor({
           id="intention"
           value={intention}
           onChange={(e) => setIntention(e.target.value as Niyet)}
-          className="w-full rounded-xl border border-white/10 bg-kuytu-black-elevated px-3 py-2.5 text-sm text-white focus:border-kuytu-gold/50 focus:outline-none"
+          className="w-full rounded-xl border border-kuytu-border bg-kuytu-card-raised px-3 py-2.5 text-sm text-kuytu-text focus:border-kuytu-gold/60 focus:outline-none focus:ring-1 focus:ring-kuytu-gold/25"
         >
           {NIYET_OPTIONS.map((n) => (
             <option key={n} value={n}>
@@ -197,7 +197,7 @@ function ProfileEditor({
       <div>
         <label
           htmlFor="bio"
-          className="pb-2 block text-sm font-semibold text-white"
+          className="pb-2 block text-sm font-semibold text-kuytu-text"
         >
           Hakkında
         </label>
@@ -207,10 +207,10 @@ function ProfileEditor({
           onChange={(e) => setBio(e.target.value)}
           rows={3}
           maxLength={500}
-          className="w-full resize-none rounded-xl border border-white/10 bg-kuytu-black-elevated px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-kuytu-gold/50 focus:outline-none"
+          className="w-full resize-none rounded-xl border border-kuytu-border bg-kuytu-card-raised px-3 py-2.5 text-sm text-kuytu-text placeholder:text-kuytu-text/40 focus:border-kuytu-gold/60 focus:outline-none focus:ring-1 focus:ring-kuytu-gold/25"
           placeholder="Kendinden kısaca bahset…"
         />
-        <p className="pt-1 text-right text-[11px] text-white/40">
+        <p className="pt-1 text-right text-[11px] text-kuytu-text/40">
           {bio.length}/500
         </p>
       </div>
@@ -221,7 +221,7 @@ function ProfileEditor({
         type="button"
         onClick={save}
         disabled={!dirty || saving}
-        className="flex items-center justify-center gap-2 rounded-full bg-kuytu-gold py-3 text-base font-semibold text-kuytu-black transition-opacity disabled:opacity-40"
+        className="flex items-center justify-center gap-2 rounded-full bg-grad-gold py-3.5 text-base font-semibold text-kuytu-bg-deep shadow-glow-gold transition-[opacity,transform] active:scale-[0.98] disabled:opacity-40 disabled:shadow-none"
       >
         {saving ? (
           <Loader2 size={18} className="animate-spin" />
@@ -272,7 +272,7 @@ export function ProfileScreen() {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
         <WifiOff className="text-kuytu-pass" size={36} />
-        <p className="max-w-xs text-sm text-white/60">{error}</p>
+        <p className="max-w-xs text-sm text-kuytu-text/60">{error}</p>
       </div>
     );
   }
@@ -296,11 +296,11 @@ export function ProfileScreen() {
           }}
         />
         <div>
-          <h1 className="flex items-center gap-2 font-serif text-2xl font-semibold text-white">
+          <h1 className="flex items-center gap-2 font-serif text-2xl font-semibold text-kuytu-text">
             {me.name}, {me.age}
             {me.verified && <VerifiedBadge size={20} />}
           </h1>
-          <p className="text-sm text-white/55">
+          <p className="text-sm text-kuytu-text/55">
             {me.gender === "kadın" ? "Kadın" : "Erkek"}
             {me.city ? ` · ${me.city}` : ""}
           </p>

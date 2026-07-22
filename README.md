@@ -33,18 +33,35 @@ Open [http://localhost:3000](http://localhost:3000) — it redirects to `/discov
 | `npm run db:studio` | Open Prisma Studio                                 |
 | `npm run gen:icons` | Regenerate the PWA icons under `public/icons/`      |
 
-## Design tokens
+## Design system — "Midnight Luxe"
 
-Defined in `tailwind.config.ts`:
+A warm, mature dark theme for the 35–55 audience. Defined in
+`tailwind.config.ts` and `app/globals.css`.
 
-| Token             | Hex       | Use                          |
-| ----------------- | --------- | ---------------------------- |
-| `kuytu-black`     | `#0B0B0E` | Deep Night Black — canvas    |
-| `kuytu-burgundy`  | `#4A0E17` | Rich Burgundy / Wine         |
-| `kuytu-gold`      | `#D4AF37` | Warm Amber / Gold — highlights |
+### Typography (`next/font/google`)
 
-Semantic action colors: `kuytu-pass` (red), `kuytu-like` (green),
-`kuytu-super` (blue).
+- **Playfair Display** (`font-serif`, `--font-playfair`) — brand headers,
+  titles, name badges (editorial elegance).
+- **Plus Jakarta Sans** (`font-sans`, `--font-jakarta`) — body, UI, buttons,
+  message bubbles (crisp, legible).
+
+### Color tokens
+
+| Token           | Hex       | Use                                   |
+| --------------- | --------- | ------------------------------------- |
+| `kuytu-bg`      | `#111015` | Deep charcoal velvet — canvas (`.soft` `#16141D`, `.deep` `#0C0B10`) |
+| `kuytu-card`    | `#1C1A24` | Card / surface (`.raised` `#23202E`)  |
+| `kuytu-border`  | `#2D2A38` | Warm hairline borders                 |
+| `kuytu-gold`    | `#E5B880` | Champagne rose-gold — primary accent (`.soft`/`.deep`) |
+| `kuytu-rose`    | `#A33246` | Garnet wine — secondary accent (`.soft`/`.deep`) |
+| `kuytu-text`    | `#F5F3EF` | Warm off-white (`.muted` `#9E9A93`)   |
+
+Action tokens: `kuytu-pass` (`#E57373` on `-bg #2A1D22`), `kuytu-like`
+(`#5BBF97`), `kuytu-super` (`#8AB4E8`). Gradients (`bg-grad-gold`,
+`bg-grad-like`, `bg-grad-rose`, `bg-grad-match`), warm glows (`shadow-glow-gold`,
+`shadow-glow-rose`, `shadow-glow-like`), and a `.glass` utility (frosted
+blur chrome) round out the system. Legacy `kuytu-black`/`kuytu-burgundy`
+aliases remain mapped to the new palette.
 
 ## Project structure
 

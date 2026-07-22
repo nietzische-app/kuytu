@@ -49,16 +49,16 @@ export function CardStack({ profiles, onSwipe }: CardStackProps) {
   }
 
   return (
-    <div className="flex h-full w-full flex-col">
-      <div className="relative flex-1">
+    <div className="flex min-h-0 w-full flex-1 flex-col">
+      <div className="relative min-h-0 flex-1">
         {/* Empty state */}
         {remaining <= 0 && (
           <div className="flex h-full flex-col items-center justify-center gap-3 px-8 text-center">
             <Sparkles className="text-kuytu-gold" size={40} />
-            <h3 className="font-serif text-2xl text-white">
+            <h3 className="font-serif text-2xl text-kuytu-text">
               Şimdilik bu kadar
             </h3>
-            <p className="max-w-xs text-sm text-white/60">
+            <p className="max-w-xs text-sm text-kuytu-text/60">
               Yeni profiller için biraz sonra tekrar uğrayın. En iyi eşleşmeler
               acele etmeyenleri bekler.
             </p>

@@ -22,16 +22,16 @@ function Bubble({ message, mine }: { message: ChatMessage; mine: boolean }) {
   return (
     <div className={`flex ${mine ? "justify-end" : "justify-start"}`}>
       <div
-        className={`max-w-[78%] rounded-2xl px-3.5 py-2 text-[15px] leading-snug ${
+        className={`max-w-[78%] rounded-2xl px-3.5 py-2 text-[15px] leading-snug shadow-surface ${
           mine
-            ? "rounded-br-md bg-kuytu-gold text-kuytu-black"
-            : "rounded-bl-md bg-kuytu-black-elevated text-white"
+            ? "rounded-br-md bg-grad-gold text-kuytu-bg-deep"
+            : "rounded-bl-md border border-kuytu-border/70 bg-kuytu-card text-kuytu-text"
         }`}
       >
         <p className="whitespace-pre-wrap break-words">{message.content}</p>
         <span
           className={`mt-0.5 block text-right text-[10px] ${
-            mine ? "text-kuytu-black/60" : "text-white/40"
+            mine ? "text-kuytu-bg-deep/55" : "text-kuytu-text/40"
           }`}
         >
           {formatClock(message.createdAt)}
@@ -128,7 +128,7 @@ export function ChatRoom({ matchId }: { matchId: string }) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
         <WifiOff className="text-kuytu-pass" size={36} />
-        <p className="max-w-xs text-sm text-white/60">{error}</p>
+        <p className="max-w-xs text-sm text-kuytu-text/60">{error}</p>
         <Link href="/chats" className="text-sm text-kuytu-gold">
           Sohbetlere dön
         </Link>
@@ -149,16 +149,16 @@ export function ChatRoom({ matchId }: { matchId: string }) {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <header className="flex items-center gap-3 border-b border-white/[0.08] bg-kuytu-black/95 px-3 py-2.5 backdrop-blur-xl">
+      <header className="glass flex items-center gap-3 border-b border-white/[0.06] px-3 py-2.5">
         <Link
           href="/chats"
           aria-label="Geri"
-          className="flex h-9 w-9 items-center justify-center rounded-full text-white/70 hover:text-white"
+          className="flex h-9 w-9 items-center justify-center rounded-full text-kuytu-text/70 transition-colors hover:text-kuytu-text"
         >
           <ChevronLeft size={24} />
         </Link>
         <div
-          className="h-9 w-9 shrink-0 rounded-full bg-cover bg-center ring-1 ring-kuytu-gold/30"
+          className="h-10 w-10 shrink-0 rounded-full bg-kuytu-rose/30 bg-cover bg-center ring-2 ring-kuytu-gold/40"
           style={{
             backgroundImage: profile.photos[0]
               ? `url(${profile.photos[0]})`
@@ -167,7 +167,7 @@ export function ChatRoom({ matchId }: { matchId: string }) {
         />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
-            <span className="truncate font-semibold text-white">
+            <span className="truncate font-semibold text-kuytu-text">
               {profile.name}
             </span>
             {profile.verified && <VerifiedBadge size={15} />}
@@ -182,10 +182,10 @@ export function ChatRoom({ matchId }: { matchId: string }) {
       <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto px-4 py-4 scroll-region">
         {convo.messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
-            <p className="font-serif text-lg text-white">
+            <p className="font-serif text-xl text-kuytu-text">
               {profile.name} ile eşleştiniz
             </p>
-            <p className="max-w-xs text-sm text-white/55">
+            <p className="max-w-xs text-sm text-kuytu-text/55">
               {convo.canSend
                 ? "İlk mesajı göndererek sohbeti başlat."
                 : convo.lockReason}
@@ -199,7 +199,7 @@ export function ChatRoom({ matchId }: { matchId: string }) {
       </div>
 
       {/* Composer */}
-      <div className="border-t border-white/[0.08] bg-kuytu-black px-3 py-2.5">
+      <div className="glass border-t border-white/[0.06] px-3 py-2.5">
         {convo.canSend ? (
           <form onSubmit={handleSend} className="flex items-end gap-2">
             <input
@@ -208,13 +208,13 @@ export function ChatRoom({ matchId }: { matchId: string }) {
               placeholder="Bir mesaj yaz…"
               aria-label="Mesaj"
               maxLength={2000}
-              className="min-w-0 flex-1 rounded-full border border-white/10 bg-kuytu-black-elevated px-4 py-2.5 text-[15px] text-white placeholder:text-white/40 focus:border-kuytu-gold/50 focus:outline-none"
+              className="min-w-0 flex-1 rounded-full border border-kuytu-border bg-kuytu-card-raised px-4 py-2.5 text-[15px] text-kuytu-text placeholder:text-kuytu-text/40 focus:border-kuytu-gold/60 focus:outline-none focus:ring-1 focus:ring-kuytu-gold/30"
             />
             <button
               type="submit"
               aria-label="Gönder"
               disabled={!draft.trim() || sending}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-kuytu-gold text-kuytu-black transition-opacity disabled:opacity-40"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-grad-gold text-kuytu-bg-deep shadow-glow-gold transition-[opacity,transform] active:scale-95 disabled:opacity-40 disabled:shadow-none"
             >
               {sending ? (
                 <Loader2 size={20} className="animate-spin" />
@@ -224,9 +224,9 @@ export function ChatRoom({ matchId }: { matchId: string }) {
             </button>
           </form>
         ) : (
-          <div className="flex items-center gap-2.5 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+          <div className="flex items-center gap-2.5 rounded-2xl border border-kuytu-gold/20 bg-kuytu-gold/[0.06] px-4 py-3">
             <Lock size={16} className="shrink-0 text-kuytu-gold" />
-            <p className="text-[13px] leading-snug text-white/70">
+            <p className="text-[13px] leading-snug text-kuytu-text/75">
               {convo.lockReason}
             </p>
           </div>

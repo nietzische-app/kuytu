@@ -15,8 +15,8 @@ export function ComingSoon({
       <div className="flex h-16 w-16 items-center justify-center rounded-full border border-kuytu-gold/25 bg-kuytu-gold/5 text-kuytu-gold">
         <Icon size={28} />
       </div>
-      <h1 className="font-serif text-2xl font-semibold text-white">{title}</h1>
-      <p className="max-w-xs text-sm text-white/60">{subtitle}</p>
+      <h1 className="font-serif text-2xl font-semibold text-kuytu-text">{title}</h1>
+      <p className="max-w-xs text-sm text-kuytu-text/60">{subtitle}</p>
     </div>
   );
 }

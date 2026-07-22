@@ -1,13 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+// Crisp, highly legible modern sans — body, UI, buttons, message bubbles.
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-jakarta",
   display: "swap",
 });
 
+// Editorial serif — brand headers, titles, name badges (Hinge-style elegance).
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
@@ -35,7 +37,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0B0B0E",
+  themeColor: "#111015",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -49,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="tr" className={`${inter.variable} ${playfair.variable} dark`}>
+    <html lang="tr" className={`${jakarta.variable} ${playfair.variable} dark`}>
       <body className="font-sans antialiased">{children}</body>
     </html>
   );

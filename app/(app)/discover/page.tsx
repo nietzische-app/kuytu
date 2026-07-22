@@ -63,31 +63,31 @@ export default function DiscoverPage() {
   return (
     <div className="flex flex-1 flex-col px-4">
       {/* Header */}
-      <header className="flex items-center justify-between py-4">
-        <h1 className="font-serif text-2xl font-semibold tracking-wide text-kuytu-gold">
+      <header className="glass sticky top-0 z-30 -mx-4 flex items-center justify-between border-b border-white/[0.05] px-4 py-3.5">
+        <h1 className="bg-grad-gold bg-clip-text font-serif text-2xl font-semibold tracking-wide text-transparent">
           Kuytu
         </h1>
         <button
           type="button"
           aria-label="Filtreler"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white/70 transition-colors hover:text-white"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-kuytu-border bg-kuytu-card/60 text-kuytu-text/70 transition-colors hover:text-kuytu-gold"
         >
           <SlidersHorizontal size={18} />
         </button>
       </header>
 
       {/* Card stack fills the remaining space. */}
-      <div className="relative flex-1 pb-4">
+      <div className="relative flex min-h-0 flex-1 flex-col pb-4 pt-4">
         {error ? (
-          <div className="flex h-full flex-col items-center justify-center gap-3 px-8 text-center">
+          <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
             <WifiOff className="text-kuytu-pass" size={36} />
-            <h3 className="font-serif text-xl text-white">
+            <h3 className="font-serif text-xl text-kuytu-text">
               Bir şeyler ters gitti
             </h3>
-            <p className="max-w-xs text-sm text-white/60">{error}</p>
+            <p className="max-w-xs text-sm text-kuytu-text/60">{error}</p>
           </div>
         ) : profiles === null ? (
-          <div className="flex h-full items-center justify-center">
+          <div className="flex flex-1 items-center justify-center">
             <Loader2 className="animate-spin text-kuytu-gold" size={32} />
           </div>
         ) : (

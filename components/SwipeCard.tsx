@@ -160,10 +160,10 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(
         }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
-        <div className="relative h-full w-full select-none overflow-hidden rounded-card bg-kuytu-black-elevated shadow-card">
-          {/* Photo */}
+        <div className="relative h-full w-full select-none overflow-hidden rounded-[1.75rem] border border-white/[0.07] bg-kuytu-card shadow-card ring-1 ring-inset ring-white/[0.04]">
+          {/* Photo (with a warm gradient fallback while it loads / if absent) */}
           <div
-            className="absolute inset-0 bg-cover bg-center"
+            className="absolute inset-0 bg-gradient-to-br from-kuytu-rose-deep via-kuytu-card to-kuytu-bg-deep bg-cover bg-center"
             style={{ backgroundImage: `url(${profile.photos[photoIndex]})` }}
             onClick={cyclePhoto}
           />
@@ -175,29 +175,32 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(
                 <span
                   key={i}
                   className={`h-1 flex-1 rounded-full transition-colors ${
-                    i === photoIndex ? "bg-white" : "bg-white/30"
+                    i === photoIndex
+                      ? "bg-kuytu-gold shadow-[0_0_8px_rgba(229,184,128,0.6)]"
+                      : "bg-white/25"
                   }`}
                 />
               ))}
             </div>
           )}
 
-          {/* Legibility gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/25 to-transparent" />
+          {/* Legibility gradient — warm, deep at the base so text pops. */}
+          <div className="absolute inset-0 bg-gradient-to-t from-kuytu-bg-deep via-kuytu-bg-deep/35 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
 
           {/* Drag stamps */}
           {active && (
             <>
               <Stamp
                 label="Beğen"
-                color="#30A46C"
+                color="#5BBF97"
                 rotate={-14}
                 style={{ opacity: likeOpacity }}
               />
               <div className="absolute right-0 top-0">
                 <Stamp
                   label="Geç"
-                  color="#E5484D"
+                  color="#E57373"
                   rotate={14}
                   style={{ opacity: passOpacity }}
                 />
@@ -207,56 +210,58 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(
                 className="pointer-events-none absolute inset-x-0 top-24 z-20 flex justify-center"
               >
                 <span
-                  className="flex items-center gap-2 rounded-lg border-4 px-4 py-1.5 text-2xl font-extrabold uppercase tracking-widest"
-                  style={{ color: "#4C9AFF", borderColor: "#4C9AFF" }}
+                  className="flex items-center gap-2 rounded-xl border-4 px-4 py-1.5 text-2xl font-extrabold uppercase tracking-widest"
+                  style={{ color: "#8AB4E8", borderColor: "#8AB4E8" }}
                 >
-                  <Star size={22} fill="#4C9AFF" /> Süper
+                  <Star size={22} fill="#8AB4E8" /> Süper
                 </span>
               </motion.div>
             </>
           )}
 
-          {/* Profile content */}
-          <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col gap-3 p-5">
-            <div className="flex items-end justify-between gap-2">
-              <div>
-                <h2 className="flex items-center gap-2 font-serif text-3xl font-semibold leading-tight text-white">
-                  {profile.name}
-                  <span className="font-sans text-2xl font-light text-white/80">
-                    {profile.age}
-                  </span>
-                  {profile.verified && <VerifiedBadge size={22} />}
-                </h2>
-                <p className="mt-1 flex items-center gap-1 text-sm text-white/70">
-                  <MapPin size={13} />
-                  {profile.location} · {profile.distanceKm} km
-                </p>
+          {/* Profile content — frosted panel so text reads over any photo. */}
+          <div className="absolute inset-x-0 bottom-0 z-10 p-3">
+            <div className="flex flex-col gap-3 rounded-[1.4rem] border border-white/[0.08] bg-black/25 p-4 backdrop-blur-md">
+              <div className="flex items-end justify-between gap-2">
+                <div>
+                  <h2 className="flex items-center gap-2 font-serif text-[1.9rem] font-semibold leading-tight text-kuytu-text">
+                    {profile.name}
+                    <span className="font-sans text-2xl font-light text-kuytu-text/75">
+                      {profile.age}
+                    </span>
+                    {profile.verified && <VerifiedBadge size={22} />}
+                  </h2>
+                  <p className="mt-1 flex items-center gap-1 text-sm text-kuytu-text/70">
+                    <MapPin size={13} className="text-kuytu-gold/80" />
+                    {profile.location} · {profile.distanceKm} km
+                  </p>
+                </div>
               </div>
-            </div>
 
-            {/* Structured badges */}
-            <div className="flex flex-wrap gap-2">
-              <NiyetBadge niyet={profile.niyet} />
-              <CocukBadge durum={profile.cocukDurumu} />
-            </div>
-
-            {/* Bio prompt — a single highlighted prompt keeps the card calm. */}
-            {profile.prompts[0] && (
-              <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-3 backdrop-blur-sm">
-                <p className="text-xs uppercase tracking-wide text-kuytu-gold/80">
-                  {profile.prompts[0].prompt}
-                </p>
-                <p className="mt-0.5 text-sm text-white/90">
-                  {profile.prompts[0].answer}
-                </p>
+              {/* Structured badges */}
+              <div className="flex flex-wrap gap-2">
+                <NiyetBadge niyet={profile.niyet} />
+                <CocukBadge durum={profile.cocukDurumu} />
               </div>
-            )}
 
-            {/* Interests */}
-            <div className="flex flex-wrap gap-1.5">
-              {profile.interests.slice(0, 4).map((tag) => (
-                <InterestChip key={tag} label={tag} />
-              ))}
+              {/* Bio prompt — a single highlighted prompt keeps the card calm. */}
+              {profile.prompts[0] && (
+                <div className="rounded-2xl border border-kuytu-gold/15 bg-kuytu-gold/[0.06] p-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-kuytu-gold/80">
+                    {profile.prompts[0].prompt}
+                  </p>
+                  <p className="mt-1 text-sm text-kuytu-text/90">
+                    {profile.prompts[0].answer}
+                  </p>
+                </div>
+              )}
+
+              {/* Interests */}
+              <div className="flex flex-wrap gap-1.5">
+                {profile.interests.slice(0, 4).map((tag) => (
+                  <InterestChip key={tag} label={tag} />
+                ))}
+              </div>
             </div>
           </div>
 
