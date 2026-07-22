@@ -34,10 +34,16 @@ Open [http://localhost:3000](http://localhost:3000) — it redirects to `/discov
 | `npm run db:studio` | Open Prisma Studio                                 |
 | `npm run gen:icons` | Regenerate the PWA icons under `public/icons/`      |
 
-## Design system — light & spacious
+## Design system — "Sıcak Sığınak & Loş Kemer"
 
-A bright, clean, mature light theme (Bumble-inspired) for the 35–55 audience.
-Defined in `tailwind.config.ts` and `app/globals.css`.
+A bright, clean, mature light theme for the 35–55 audience. The signature motif
+is *cozy sanctuary & arch*: soft vaulted arches (`rounded-t-[2.75rem]`) on cards,
+modals and profile frames; warm champagne **ambient-glow** avatar rings
+(`ring-2 ring-kuytu-accent/50 shadow-[0_0_12px_rgba(212,163,115,0.3)]`); a
+floating **glassmorphism action dock** (Pas · Geri Al · Kıvılcım · Beğen) that
+lifts off the photo; and a rounded icon set (`Sparkles`, `Heart`, `RotateCcw`,
+`X`, `ShieldCheck`, `MessageCircleHeart`). Defined in `tailwind.config.ts` and
+`app/globals.css`.
 
 ### Typography (`next/font/google`)
 

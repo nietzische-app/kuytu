@@ -15,7 +15,7 @@ import {
   type MotionValue,
   type PanInfo,
 } from "framer-motion";
-import { Heart, X, Star, MapPin } from "lucide-react";
+import { Star, MapPin } from "lucide-react";
 import type { Profile, SwipeAction } from "@/lib/types";
 import {
   SWIPE_COMMIT_THRESHOLD,
@@ -155,9 +155,9 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(
         }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
-        <div className="flex h-full w-full select-none flex-col overflow-hidden rounded-[1.5rem] border border-kuytu-border bg-kuytu-card shadow-card">
-          {/* Photo */}
-          <div className="relative flex-1 overflow-hidden">
+        <div className="flex h-full w-full select-none flex-col overflow-hidden rounded-b-[1.75rem] rounded-t-[2.75rem] border border-kuytu-border bg-kuytu-card shadow-card">
+          {/* Photo — arched "vault" top */}
+          <div className="relative flex-1 overflow-hidden rounded-t-[2.5rem]">
             <div
               className="absolute inset-0 bg-kuytu-bg-deep bg-cover bg-center"
               style={{ backgroundImage: `url(${profile.photos[photoIndex]})` }}
@@ -166,7 +166,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(
 
             {/* Photo progress indicators */}
             {profile.photos.length > 1 && (
-              <div className="absolute left-4 right-4 top-3 z-20 flex gap-1.5">
+              <div className="absolute left-6 right-6 top-3 z-20 flex gap-1.5">
                 {profile.photos.map((_, i) => (
                   <span
                     key={i}
@@ -180,7 +180,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(
 
             {/* Verified pill on the photo */}
             {profile.verified && (
-              <div className="absolute left-3 top-3 z-20 flex items-center gap-1 rounded-full bg-black/45 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-md">
+              <div className="absolute left-4 top-4 z-20 flex items-center gap-1 rounded-full bg-black/45 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-md">
                 <VerifiedBadge size={14} />
                 Doğrulanmış
               </div>
@@ -218,32 +218,17 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(
             )}
           </div>
 
-          {/* White footer — name / age + like affordance (image_4 style) */}
-          <div className="flex items-center justify-between gap-3 px-5 py-4">
-            <div className="min-w-0">
-              <h2 className="flex items-center gap-1.5 text-2xl font-extrabold leading-tight text-kuytu-text">
-                <span className="truncate">{profile.name}</span>
-                <span className="font-bold text-kuytu-text/80">
-                  {profile.age}
-                </span>
-              </h2>
-              <p className="mt-0.5 flex items-center gap-1 text-sm text-kuytu-muted">
-                <MapPin size={13} className="text-kuytu-accent" />
-                {profile.location} · {profile.distanceKm} km
-              </p>
-            </div>
-            {active && (
-              <button
-                type="button"
-                aria-label="Beğen"
-                onClick={() => commit("like")}
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-kuytu-border text-kuytu-accent transition-colors hover:border-kuytu-accent hover:bg-kuytu-accent/10"
-              >
-                <Heart size={22} strokeWidth={2.4} />
-              </button>
-            )}
+          {/* White footer — name / age (actions live in the floating dock) */}
+          <div className="px-5 py-4">
+            <h2 className="flex items-center gap-1.5 text-2xl font-extrabold leading-tight text-kuytu-text">
+              <span className="truncate">{profile.name}</span>
+              <span className="font-bold text-kuytu-text/80">{profile.age}</span>
+            </h2>
+            <p className="mt-0.5 flex items-center gap-1 text-sm text-kuytu-muted">
+              <MapPin size={13} className="text-kuytu-accent" />
+              {profile.location} · {profile.distanceKm} km
+            </p>
           </div>
-          <X className="hidden" aria-hidden />
         </div>
       </motion.div>
     );

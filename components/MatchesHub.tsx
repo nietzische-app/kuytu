@@ -2,14 +2,20 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronRight, Loader2, Sparkles, WifiOff } from "lucide-react";
+import {
+  ChevronRight,
+  Loader2,
+  MessageCircleHeart,
+  Sparkles,
+  WifiOff,
+} from "lucide-react";
 import { fetchMatches } from "@/lib/api";
 import { formatRelativeTime } from "@/lib/time";
 import { useCountdown } from "@/lib/useCountdown";
 import type { GroupedMatches, MatchSummary } from "@/lib/types";
 import { VerifiedBadge } from "./ProfileBadges";
 
-/** Circular avatar with a graceful fallback and optional champagne ring. */
+/** Circular avatar with a graceful fallback and an optional warm gold glow. */
 function Avatar({
   src,
   alt,
@@ -24,7 +30,9 @@ function Avatar({
   return (
     <div
       className={`shrink-0 overflow-hidden rounded-full bg-kuytu-bg-deep bg-cover bg-center ${
-        ring ? "ring-[3px] ring-kuytu-accent ring-offset-2 ring-offset-kuytu-card" : ""
+        ring
+          ? "ring-2 ring-kuytu-accent/50 shadow-[0_0_12px_rgba(212,163,115,0.3)]"
+          : ""
       }`}
       style={{
         width: size,
@@ -72,9 +80,9 @@ function SpotlightBanner() {
   return (
     <button
       type="button"
-      className="flex w-full items-center gap-3 rounded-2xl border border-kuytu-border bg-kuytu-card p-3.5 text-left shadow-soft transition-transform active:scale-[0.99]"
+      className="flex w-full items-center gap-3 rounded-3xl border border-kuytu-border bg-kuytu-card p-3.5 text-left shadow-soft transition-transform active:scale-[0.99]"
     >
-      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-kuytu-accent-soft text-kuytu-text">
+      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-kuytu-accent-soft text-kuytu-accent-deep shadow-[0_0_12px_rgba(212,163,115,0.3)]">
         <Sparkles size={22} />
       </span>
       <span className="min-w-0 flex-1">
@@ -204,7 +212,8 @@ export function MatchesHub() {
       )}
 
       <section>
-        <h2 className="pb-1 text-lg font-extrabold text-kuytu-text">
+        <h2 className="flex items-center gap-2 pb-1 text-lg font-extrabold text-kuytu-text">
+          <MessageCircleHeart size={19} className="text-kuytu-accent" />
           Sohbetler <span className="text-kuytu-muted">(Son)</span>
         </h2>
         {data.conversations.length > 0 ? (

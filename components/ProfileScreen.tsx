@@ -228,7 +228,7 @@ export function ProfileScreen() {
       {/* Identity header */}
       <div className="flex items-center gap-4 pt-2">
         <div
-          className="h-20 w-20 shrink-0 rounded-full bg-cover bg-center ring-2 ring-kuytu-accent ring-offset-2 ring-offset-kuytu-bg"
+          className="h-20 w-20 shrink-0 rounded-full bg-kuytu-bg-deep bg-cover bg-center ring-2 ring-kuytu-accent/50 shadow-[0_0_14px_rgba(212,163,115,0.35)]"
           style={{
             backgroundImage: me.photos[0] ? `url(${me.photos[0]})` : undefined,
           }}

@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   Loader2,
   Lock,
+  MessageCircleHeart,
   Send,
   WifiOff,
 } from "lucide-react";
@@ -158,7 +159,7 @@ export function ChatRoom({ matchId }: { matchId: string }) {
           <ChevronLeft size={24} />
         </Link>
         <div
-          className="h-10 w-10 shrink-0 rounded-full bg-kuytu-bg-deep bg-cover bg-center ring-2 ring-kuytu-accent ring-offset-1 ring-offset-kuytu-card"
+          className="h-10 w-10 shrink-0 rounded-full bg-kuytu-bg-deep bg-cover bg-center ring-2 ring-kuytu-accent/50 shadow-[0_0_12px_rgba(212,163,115,0.3)]"
           style={{
             backgroundImage: profile.photos[0]
               ? `url(${profile.photos[0]})`
@@ -182,6 +183,7 @@ export function ChatRoom({ matchId }: { matchId: string }) {
       <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto px-4 py-4 scroll-region">
         {convo.messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
+            <MessageCircleHeart size={40} className="text-kuytu-accent" />
             <p className="text-xl font-extrabold text-kuytu-text">
               {profile.name} ile eşleştiniz
             </p>

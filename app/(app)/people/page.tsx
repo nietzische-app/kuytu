@@ -1,4 +1,4 @@
-import { SlidersHorizontal } from "lucide-react";
+import { Sparkles, SlidersHorizontal } from "lucide-react";
 import { PeopleDeck } from "@/components/PeopleDeck";
 
 /**
@@ -9,8 +9,13 @@ export default function PeoplePage() {
   return (
     <div className="flex flex-1 flex-col">
       <header className="flex items-center justify-between px-5 pt-4 pb-3">
-        <h1 className="text-[2rem] font-extrabold tracking-tight text-kuytu-text">
+        <h1 className="flex items-center gap-1.5 text-[2rem] font-extrabold tracking-tight text-kuytu-text">
           Kuytu
+          <Sparkles
+            size={18}
+            className="text-kuytu-accent drop-shadow-[0_0_8px_rgba(212,163,115,0.55)]"
+            fill="currentColor"
+          />
         </h1>
         <button
           type="button"

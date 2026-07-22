@@ -108,7 +108,7 @@ export function PhotoManager({ photos, onPersisted }: PhotoManagerProps) {
             return (
               <div
                 key={`${url}-${i}`}
-                className="group relative aspect-[3/4] overflow-hidden rounded-2xl border border-kuytu-border bg-kuytu-bg-deep bg-cover bg-center shadow-soft"
+                className="group relative aspect-[3/4] overflow-hidden rounded-b-2xl rounded-t-[1.5rem] border border-kuytu-border bg-kuytu-bg-deep bg-cover bg-center shadow-soft"
                 style={{ backgroundImage: `url(${url})` }}
               >
                 {/* Primary badge on slot #1 ("Ana Profil Fotoğrafı") */}
@@ -168,7 +168,7 @@ export function PhotoManager({ photos, onPersisted }: PhotoManagerProps) {
               aria-label="Fotoğraf ekle"
               onClick={() => !busy && inputRef.current?.click()}
               disabled={busy}
-              className="flex aspect-[3/4] items-center justify-center rounded-2xl border-2 border-dashed border-kuytu-border bg-kuytu-card-raised text-kuytu-muted transition-colors hover:border-kuytu-accent hover:text-kuytu-accent disabled:cursor-not-allowed"
+              className="flex aspect-[3/4] items-center justify-center rounded-b-2xl rounded-t-[1.5rem] border-2 border-dashed border-kuytu-border bg-kuytu-card-raised text-kuytu-muted transition-colors hover:border-kuytu-accent hover:text-kuytu-accent disabled:cursor-not-allowed"
             >
               {showSpinner ? (
                 <Loader2 size={22} className="animate-spin text-kuytu-accent" />

@@ -1,4 +1,4 @@
-import { BadgeCheck, Baby, Target } from "lucide-react";
+import { ShieldCheck, Baby, Target } from "lucide-react";
 import type { CocukDurumu, Niyet } from "@/lib/types";
 
 /**
@@ -55,7 +55,7 @@ export function VerifiedBadge({
 }) {
   return (
     <span className="inline-flex items-center gap-1 text-kuytu-accent">
-      <BadgeCheck size={size} strokeWidth={2.5} aria-label="Doğrulanmış Profil" />
+      <ShieldCheck size={size} strokeWidth={2.5} aria-label="Doğrulanmış Profil" />
       {showLabel && <span className="text-xs font-semibold">Doğrulanmış</span>}
     </span>
   );

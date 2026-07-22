@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Heart, Loader2, Plus, WifiOff } from "lucide-react";
+import { Heart, Loader2, Sparkles, WifiOff } from "lucide-react";
 import { fetchLikedYou, fetchMe, sendSwipe } from "@/lib/api";
 import type { Match, Profile } from "@/lib/types";
 import { MatchModal } from "./MatchModal";
@@ -14,11 +14,11 @@ function SpotlightUpsell({ hero }: { hero?: string | null }) {
     <div className="flex flex-col items-center px-4 pt-10 text-center">
       <div className="relative mb-6">
         <div
-          className="h-28 w-28 rounded-full bg-kuytu-bg-deep bg-cover bg-center ring-4 ring-kuytu-card"
+          className="h-28 w-28 rounded-full bg-kuytu-bg-deep bg-cover bg-center ring-2 ring-kuytu-accent/50 shadow-[0_0_18px_rgba(212,163,115,0.35)]"
           style={{ backgroundImage: hero ? `url(${hero})` : undefined }}
         />
-        <span className="absolute -bottom-1 -right-1 flex h-10 w-10 items-center justify-center rounded-full bg-kuytu-text text-white ring-4 ring-kuytu-bg">
-          <Plus size={20} strokeWidth={3} />
+        <span className="absolute -bottom-1 -right-1 flex h-10 w-10 items-center justify-center rounded-full bg-grad-gold text-kuytu-text shadow-glow-gold ring-4 ring-kuytu-bg">
+          <Sparkles size={18} strokeWidth={2.6} />
         </span>
       </div>
       <h2 className="max-w-[16rem] text-3xl font-extrabold leading-tight text-kuytu-text">
@@ -49,7 +49,7 @@ function LikerCard({
   pending: boolean;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-kuytu-border bg-kuytu-card shadow-soft">
+    <div className="relative overflow-hidden rounded-b-3xl rounded-t-[2rem] border border-kuytu-border bg-kuytu-card shadow-soft">
       <div
         className="aspect-[3/4] bg-kuytu-bg-deep bg-cover bg-center"
         style={{
@@ -157,7 +157,7 @@ export function LikedYou() {
               />
             ))}
           </div>
-          <div className="mt-6 rounded-2xl border border-kuytu-border bg-kuytu-card p-4 text-center shadow-soft">
+          <div className="mt-6 rounded-3xl border border-kuytu-border bg-kuytu-card p-4 text-center shadow-soft">
             <p className="font-extrabold text-kuytu-text">
               10 kat daha fazla görün
             </p>

@@ -60,7 +60,7 @@ export function MatchModal({
             role="dialog"
             aria-modal="true"
             aria-label="Eşleşme Sağlandı"
-            className="relative w-full max-w-sm overflow-hidden rounded-card border border-kuytu-border bg-grad-match shadow-card"
+            className="relative w-full max-w-sm overflow-hidden rounded-b-[1.75rem] rounded-t-[2.75rem] border border-kuytu-border bg-grad-match shadow-card"
             initial={{ scale: 0.85, y: 24, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.9, y: 12, opacity: 0 }}
@@ -79,7 +79,7 @@ export function MatchModal({
               {/* Overlapping avatars */}
               <div className="mb-5 flex items-center">
                 <div
-                  className="h-20 w-20 rounded-full border-4 border-kuytu-card bg-kuytu-bg-deep bg-cover bg-center shadow-soft ring-2 ring-kuytu-accent"
+                  className="h-20 w-20 rounded-full border-4 border-kuytu-card bg-kuytu-bg-deep bg-cover bg-center ring-2 ring-kuytu-accent/50 shadow-[0_0_16px_rgba(212,163,115,0.4)]"
                   style={{
                     backgroundImage: `url(https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&q=80)`,
                   }}
@@ -93,7 +93,7 @@ export function MatchModal({
                   <Heart size={22} fill="currentColor" />
                 </motion.div>
                 <div
-                  className="h-20 w-20 rounded-full border-4 border-kuytu-card bg-kuytu-bg-deep bg-cover bg-center shadow-soft ring-2 ring-kuytu-accent"
+                  className="h-20 w-20 rounded-full border-4 border-kuytu-card bg-kuytu-bg-deep bg-cover bg-center ring-2 ring-kuytu-accent/50 shadow-[0_0_16px_rgba(212,163,115,0.4)]"
                   style={{ backgroundImage: `url(${match.profile.photos[0]})` }}
                 />
               </div>
