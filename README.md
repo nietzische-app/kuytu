@@ -10,6 +10,7 @@ uncluttered, dark-mode-first, and trustworthy.
 - **Framer Motion** — swipe gestures & transitions
 - **Lucide React** — icons
 - **Prisma + PostgreSQL** — data layer (users, swipes, matches, messages)
+- **Uploadthing** — real image uploads for the profile Photo Manager
 
 ## Getting started
 
@@ -77,6 +78,7 @@ app/
     chats/[matchId]/      Chat screen (women-first composer)
     matches/page.tsx      Eşleşmeler — same hub (not in nav)
     profile/page.tsx      Profil — switcher + editor
+    profile/PhotoManager.tsx  6-slot photo grid (Uploadthing upload/reorder)
   api/
     discover/route.ts               GET nearby, unseen, compatible profiles
     swipe/route.ts                  POST a swipe; mints a Match on a mutual like
@@ -85,6 +87,8 @@ app/
     matches/[matchId]/messages/     GET history · POST send (women-first)
     me/route.ts                     GET/PATCH the current user's profile
     auth/switch/route.ts            POST demo identity switch (sets cookie)
+    uploadthing/core.ts             Uploadthing file router (profileImage)
+    uploadthing/route.ts            Uploadthing GET/POST handlers
 components/
   SwipeCard.tsx           Draggable white profile card (Framer Motion)
   CardStack.tsx           Stack orchestration, rewind, empty state
@@ -104,6 +108,7 @@ lib/
   auth.ts                 getCurrentUser() + demo account list (MVP)
   discovery.ts            getDiscoverProfiles() — proximity feed
   liked.ts                getUsersWhoLikedMe() — "Liked You" feed
+  uploadthing.ts          Typed Uploadthing React helpers (useUploadThing)
   matching.ts             recordSwipe() — swipe + mutual-match logic
   messaging.ts            matches list, conversation, send + women-first rule
   geo.ts                  Haversine distance
@@ -137,6 +142,16 @@ scripts/
 The "current user" is resolved by `lib/auth.ts` — an MVP stub that reads a
 `kuytu_uid` cookie, then falls back to the seeded `demo@kuytu.app`. Swap this
 for real authentication before production.
+
+### Photo uploads
+
+The **Profil** tab has a Bumble-style 6-slot Photo Manager
+(`app/(app)/profile/PhotoManager.tsx`). Empty slots open the file picker and
+upload via Uploadthing (`profileImage`: images only, ≤ 6, ≤ 4 MB each); each
+photo can be deleted or reordered with the ← → arrows, and slot #1 is badged
+"Ana". Every change persists to `photos[]` through `PATCH /api/me` and syncs the
+active profile immediately. Set `UPLOADTHING_TOKEN` (see `.env.example`) for
+uploads to work.
 
 ### Women-first rule
 

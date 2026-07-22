@@ -7,6 +7,9 @@ const nextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      // Uploadthing file hosts.
+      { protocol: "https", hostname: "utfs.io" },
+      { protocol: "https", hostname: "*.ufs.sh" },
     ],
   },
 };

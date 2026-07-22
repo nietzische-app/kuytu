@@ -1,17 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Check,
-  Loader2,
-  Plus,
-  RefreshCw,
-  Trash2,
-  UserCog,
-  WifiOff,
-} from "lucide-react";
+import { Check, Loader2, RefreshCw, UserCog, WifiOff } from "lucide-react";
 import { fetchMe, switchAccount, updateMe } from "@/lib/api";
 import type { DemoAccount, MeProfile, Niyet } from "@/lib/types";
+import { PhotoManager } from "@/app/(app)/profile/PhotoManager";
 import { VerifiedBadge } from "./ProfileBadges";
 
 const NIYET_OPTIONS: Niyet[] = [
@@ -92,30 +85,18 @@ function ProfileEditor({
 }) {
   const [bio, setBio] = useState(me.bio);
   const [intention, setIntention] = useState<Niyet>(me.intention);
-  const [photos, setPhotos] = useState<string[]>(me.photos);
-  const [newPhoto, setNewPhoto] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  const dirty =
-    bio !== me.bio ||
-    intention !== me.intention ||
-    JSON.stringify(photos) !== JSON.stringify(me.photos);
-
-  function addPhoto() {
-    const url = newPhoto.trim();
-    if (!url || photos.length >= 6) return;
-    setPhotos((p) => [...p, url]);
-    setNewPhoto("");
-  }
+  const dirty = bio !== me.bio || intention !== me.intention;
 
   async function save() {
     setSaving(true);
     setErr(null);
     setSaved(false);
     try {
-      const next = await updateMe({ bio, intention, photos });
+      const next = await updateMe({ bio, intention });
       onSaved(next);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -128,49 +109,6 @@ function ProfileEditor({
 
   return (
     <section className="flex flex-col gap-5">
-      {/* Photos */}
-      <div>
-        <label className="pb-2 block text-sm font-semibold text-kuytu-text">
-          Fotoğraflar
-        </label>
-        <div className="grid grid-cols-3 gap-2">
-          {photos.map((url, i) => (
-            <div
-              key={`${url}-${i}`}
-              className="relative aspect-[3/4] overflow-hidden rounded-xl bg-cover bg-center ring-1 ring-kuytu-border"
-              style={{ backgroundImage: `url(${url})` }}
-            >
-              <button
-                type="button"
-                aria-label="Fotoğrafı kaldır"
-                onClick={() => setPhotos((p) => p.filter((_, idx) => idx !== i))}
-                className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-kuytu-text"
-              >
-                <Trash2 size={13} />
-              </button>
-            </div>
-          ))}
-        </div>
-        {photos.length < 6 && (
-          <div className="mt-2 flex gap-2">
-            <input
-              value={newPhoto}
-              onChange={(e) => setNewPhoto(e.target.value)}
-              placeholder="Fotoğraf URL'si ekle"
-              className="min-w-0 flex-1 rounded-xl border border-kuytu-border bg-kuytu-card-raised px-3 py-2 text-sm text-kuytu-text placeholder:text-kuytu-text/40 focus:border-kuytu-gold/60 focus:outline-none focus:ring-1 focus:ring-kuytu-gold/25"
-            />
-            <button
-              type="button"
-              onClick={addPhoto}
-              aria-label="Ekle"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-kuytu-border text-kuytu-gold"
-            >
-              <Plus size={18} />
-            </button>
-          </div>
-        )}
-      </div>
-
       {/* Intention */}
       <div>
         <label
@@ -312,6 +250,8 @@ export function ProfileScreen() {
         onSwitch={handleSwitch}
         switching={switching}
       />
+
+      <PhotoManager photos={me.photos} onPersisted={setMe} />
 
       <ProfileEditor me={me} onSaved={setMe} />
     </div>
