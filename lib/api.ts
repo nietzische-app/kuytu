@@ -6,6 +6,7 @@ import type {
   MeProfile,
   Niyet,
   Profile,
+  ProfilePrompt,
   SwipeAction,
 } from "./types";
 import { actionToDirection } from "./mappers";
@@ -115,12 +116,27 @@ export async function fetchMe(): Promise<MeResponse> {
   return (await res.json()) as MeResponse;
 }
 
-/** Updates the current user's editable profile fields. */
-export async function updateMe(patch: {
-  bio?: string;
+/** A partial profile update accepted by `PATCH /api/me`. */
+export interface ProfilePatch {
+  name?: string;
+  age?: number;
+  gender?: "kadın" | "erkek";
+  targetGender?: "kadın" | "erkek";
   intention?: Niyet;
+  bio?: string;
   photos?: string[];
-}): Promise<MeProfile> {
+  jobTitle?: string | null;
+  education?: string | null;
+  height?: number | null;
+  zodiac?: string | null;
+  smoking?: string | null;
+  alcohol?: string | null;
+  pets?: string | null;
+  prompts?: ProfilePrompt[];
+}
+
+/** Updates the current user's editable profile fields. */
+export async function updateMe(patch: ProfilePatch): Promise<MeProfile> {
   const res = await fetch("/api/me", {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },

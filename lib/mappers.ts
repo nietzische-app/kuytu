@@ -80,17 +80,41 @@ export interface UserRow {
   longitude: number;
   interests: string[];
   prompts: unknown;
+  jobTitle?: string | null;
+  education?: string | null;
+  height?: number | null;
+  zodiac?: string | null;
+  smoking?: string | null;
+  alcohol?: string | null;
+  pets?: string | null;
 }
 
-function parsePrompts(value: unknown): BioPrompt[] {
+/**
+ * Normalizes stored prompts into the card's display shape. Accepts both the
+ * structured `{ questionText, answerText }` form and the legacy
+ * `{ prompt, answer }` form, keeping only entries with a non-empty answer.
+ */
+export function parseDisplayPrompts(value: unknown): BioPrompt[] {
   if (!Array.isArray(value)) return [];
-  return value.filter(
-    (p): p is BioPrompt =>
-      typeof p === "object" &&
-      p !== null &&
-      typeof (p as BioPrompt).prompt === "string" &&
-      typeof (p as BioPrompt).answer === "string",
-  );
+  const out: BioPrompt[] = [];
+  for (const p of value) {
+    if (!p || typeof p !== "object") continue;
+    const rec = p as Record<string, unknown>;
+    const prompt =
+      typeof rec.questionText === "string"
+        ? rec.questionText
+        : typeof rec.prompt === "string"
+          ? rec.prompt
+          : "";
+    const answer =
+      typeof rec.answerText === "string"
+        ? rec.answerText
+        : typeof rec.answer === "string"
+          ? rec.answer
+          : "";
+    if (prompt && answer) out.push({ prompt, answer });
+  }
+  return out;
 }
 
 /**
@@ -110,7 +134,16 @@ export function toProfile(user: UserRow, distanceKm: number): Profile {
     niyet: intentionToNiyet[user.intention],
     cocukDurumu: kidsStatusToLabel[user.kidsStatus],
     bio: user.bio,
-    prompts: parsePrompts(user.prompts),
+    prompts: parseDisplayPrompts(user.prompts),
     interests: user.interests,
+    lifestyle: {
+      jobTitle: user.jobTitle ?? null,
+      education: user.education ?? null,
+      height: user.height ?? null,
+      zodiac: user.zodiac ?? null,
+      smoking: user.smoking ?? null,
+      alcohol: user.alcohol ?? null,
+      pets: user.pets ?? null,
+    },
   };
 }

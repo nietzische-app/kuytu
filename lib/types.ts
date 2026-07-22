@@ -17,10 +17,28 @@ export type CocukDurumu =
   | "İstiyorum" // Wants kids
   | "İstemiyorum"; // Doesn't want kids
 
-/** A short prompt-style bio entry, à la Bumble. */
+/** A short prompt-style bio entry, à la Bumble (display shape for cards). */
 export interface BioPrompt {
   prompt: string;
   answer: string;
+}
+
+/** A stored icebreaker prompt Q&A (editing shape). */
+export interface ProfilePrompt {
+  questionId: string;
+  questionText: string;
+  answerText: string;
+}
+
+/** Optional lifestyle attributes shown as chips. */
+export interface Lifestyle {
+  jobTitle: string | null;
+  education: string | null;
+  height: number | null;
+  zodiac: string | null;
+  smoking: string | null;
+  alcohol: string | null;
+  pets: string | null;
 }
 
 export interface Profile {
@@ -42,6 +60,8 @@ export interface Profile {
   prompts: BioPrompt[];
   /** Free-form interest tags. */
   interests: string[];
+  /** Optional lifestyle attributes for the card. */
+  lifestyle: Lifestyle;
 }
 
 /** The direction a card was committed in. */
@@ -110,12 +130,25 @@ export interface MeProfile {
   name: string;
   age: number;
   gender: "kadın" | "erkek";
+  targetGender: "kadın" | "erkek";
   bio: string;
   photos: string[];
-  /** Niyet, as the raw enum value, for the editor's select. */
+  /** Niyet, as the Turkish label, for the editor's select. */
   intention: Niyet;
   verified: boolean;
   city: string | null;
+  /** Deep-profile lifestyle attributes (any may be null). */
+  jobTitle: string | null;
+  education: string | null;
+  height: number | null;
+  zodiac: string | null;
+  smoking: string | null;
+  alcohol: string | null;
+  pets: string | null;
+  /** Icebreaker prompts (≤ 3). */
+  prompts: ProfilePrompt[];
+  /** "Profil Doluluk Oranı" (0–100). */
+  profileCompletion: number;
 }
 
 /** A switchable demo identity for the MVP profile switcher. */

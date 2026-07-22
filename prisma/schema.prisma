@@ -59,7 +59,20 @@ model User {
   // core matching logic; safe to leave empty.
   city      String? // Human-readable locality shown under the name.
   interests String[] // Free-form interest tags.
-  prompts   Json? // Array of { prompt, answer } bio prompts.
+  // Icebreaker prompts — array of { questionId, questionText, answerText } (≤3).
+  prompts   Json?
+
+  // ---- Deep profile (all optional) ----
+  jobTitle  String? // Örn: "Mimarlık", "Finans Yöneticisi"
+  education String? // Örn: "Lisans", "Yüksek Lisans"
+  height    Int? // Boy, cm cinsinden
+  zodiac    String? // Burç
+  smoking   String? // "Kullanmıyorum" | "Sosyal İçici" | "Kullanıyorum"
+  alcohol   String? // "Kullanmıyorum" | "Sosyal İçici" | "Özel Günlerde"
+  pets      String? // "Kedi Sahibi" | "Köpek Sahibi" | "Evcil Hayvanı Yok" | ...
+
+  // "Profil Doluluk Oranı" — recomputed on every profile write.
+  profileCompletion Int @default(40)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

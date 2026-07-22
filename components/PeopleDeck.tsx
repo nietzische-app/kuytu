@@ -8,6 +8,7 @@ import type { Match, Profile, SwipeAction } from "@/lib/types";
 import { ActionButtons } from "./ActionButtons";
 import { MatchModal } from "./MatchModal";
 import { VerifiedBadge } from "./ProfileBadges";
+import { LifestyleBadges } from "./LifestyleChips";
 
 /**
  * The primary "People" deck — one immersive, full-bleed profile at a time with
@@ -114,31 +115,40 @@ export function PeopleDeck() {
             <span className="truncate">{current.name}</span>
             <span className="font-bold">{current.age}</span>
           </h2>
+          <div className="mt-2">
+            <LifestyleBadges lifestyle={current.lifestyle} max={3} dark />
+          </div>
         </div>
       </div>
 
-      {/* Prompt card */}
-      {(current.prompts[0] || current.interests.length > 0) && (
-        <div className="rounded-3xl border border-kuytu-border bg-kuytu-card p-4 shadow-soft">
-          <p className="text-base font-extrabold text-kuytu-text">
-            {current.prompts[0]?.prompt ?? "Konuşabileceğimiz şeyler"}
-          </p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {current.prompts[0] ? (
-              <span className="rounded-full bg-kuytu-card-raised px-3 py-1.5 text-sm font-medium text-kuytu-text/80">
-                {current.prompts[0].answer}
-              </span>
-            ) : (
-              current.interests.slice(0, 3).map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full bg-kuytu-card-raised px-3 py-1.5 text-sm font-medium text-kuytu-text/80"
-                >
-                  {tag}
-                </span>
-              ))
-            )}
-          </div>
+      {/* Prompt + lifestyle card */}
+      {(current.prompts.length > 0 || current.interests.length > 0) && (
+        <div className="rounded-b-3xl rounded-t-[2rem] border border-kuytu-border bg-kuytu-card p-4 shadow-soft">
+          {current.prompts.slice(0, 2).map((p) => (
+            <div key={p.prompt} className="mb-3 last:mb-0">
+              <p className="text-[13px] font-bold uppercase tracking-wide text-kuytu-accent-deep">
+                {p.prompt}
+              </p>
+              <p className="mt-0.5 text-[15px] text-kuytu-text/85">{p.answer}</p>
+            </div>
+          ))}
+          {current.prompts.length === 0 && (
+            <>
+              <p className="text-base font-extrabold text-kuytu-text">
+                Konuşabileceğimiz şeyler
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {current.interests.slice(0, 3).map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full bg-kuytu-card-raised px-3 py-1.5 text-sm font-medium text-kuytu-text/80"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
 

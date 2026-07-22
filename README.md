@@ -177,10 +177,27 @@ Switch between them on the **Profil** tab to test the women-first flow:
 | `kemal@kuytu.app`  | Erkek  | New match with Deniz — composer locked until she writes |
 | `ahmet@kuytu.app`  | Erkek  | Active chat with Deniz — can send                 |
 
+### Onboarding & deep profile
+
+- **Onboarding wizard** (`/onboarding`, `components/Onboarding.tsx`) — 3 steps
+  with a live completion meter: **Step 1** (mandatory, ~30s) name/age/gender/
+  target/Niyet; **Step 2** (optional, "Atla") main photo; **Step 3** (optional,
+  "Profilini Derinleştir") lifestyle chips + up to 3 icebreaker prompts.
+- **Enhanced profile editor** (`/profile`) — avatar with glow ring, location
+  badge, a **"Profil Doluluk Oranı"** card with tips, and accordion sections:
+  Temel Bilgiler, Yaşam Tarzı (quick-tap chips, auto-save), Buz Kırıcı Kartlar.
+- **Completion** — `lib/completion.ts` (`computeCompletion`) recomputes
+  `profileCompletion` (0–100) on every `PATCH /api/me`; base 40 for the
+  mandatory core, +60 across optional deep-profile fields.
+- **Card integration** — `/discover` and `/people` cards show lifestyle chips
+  (`components/LifestyleChips.tsx`) and prompt Q&As.
+
 ## Data model
 
 - **User** — profile, `gender`/`targetGender`, `intention` (Niyet),
-  `kidsStatus` (Çocuk Durumu), `isVerified`, `latitude`/`longitude`.
+  `kidsStatus` (Çocuk Durumu), `isVerified`, `latitude`/`longitude`; deep
+  profile `jobTitle`, `education`, `height`, `zodiac`, `smoking`, `alcohol`,
+  `pets`, `prompts` (JSON, ≤3), and `profileCompletion`.
 - **Swipe** — `swiperId`, `targetId`, `direction`; unique per pair.
 - **Match** — ordered `user1Id`/`user2Id` (unique pair), `expiresAt` (48h
   window), `isFirstMessageSent`, per-user `lastReadAt` cursors (unread counts).
@@ -195,7 +212,8 @@ Switch between them on the **Profil** tab to test the women-first flow:
   runs on `FIRST_MOVE_WINDOW_MS`.
 - **Messaging:** grouped matches list (Yeni Eşleşmeler / Sohbetler), real chat
   history, unread counts, mark-as-read on open, and light polling for new messages.
-- **Onboarding/profile:** demo identity switcher + editable bio / intention / photos.
+- **Onboarding/profile:** multi-step wizard, deep-profile editor with lifestyle
+  chips + icebreaker prompts, and a live "Profil Doluluk Oranı" meter.
 - **Structured badges:** Niyet, Çocuk Durumu, and a Doğrulanmış (verified) mark.
 - **App feel:** fixed phone-width shell, bottom navigation, spring transitions.
 

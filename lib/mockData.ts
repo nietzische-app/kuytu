@@ -8,8 +8,9 @@ import type { Profile } from "./types";
  * is consumed by `prisma/seed.ts` to populate that database.
  *
  * Photos use Unsplash portrait URLs (allow-listed in next.config.mjs).
+ * Lifestyle attributes are applied separately in the seed (see `deepByEmail`).
  */
-export const mockProfiles: Profile[] = [
+export const mockProfiles: Omit<Profile, "lifestyle">[] = [
   {
     id: "p1",
     name: "Elif",

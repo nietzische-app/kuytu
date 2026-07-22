@@ -23,6 +23,7 @@ import {
   SWIPE_FLYOUT_DISTANCE,
 } from "@/lib/constants";
 import { VerifiedBadge } from "./ProfileBadges";
+import { LifestyleBadges } from "./LifestyleChips";
 
 /** Imperative handle so parent controls (buttons) can trigger a swipe. */
 export interface SwipeCardHandle {
@@ -218,8 +219,8 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(
             )}
           </div>
 
-          {/* White footer — name / age (actions live in the floating dock) */}
-          <div className="px-5 py-4">
+          {/* White footer — name / age + rich context (actions in the dock) */}
+          <div className="max-h-[42%] overflow-y-auto px-5 py-4 scroll-region">
             <h2 className="flex items-center gap-1.5 text-2xl font-extrabold leading-tight text-kuytu-text">
               <span className="truncate">{profile.name}</span>
               <span className="font-bold text-kuytu-text/80">{profile.age}</span>
@@ -228,6 +229,21 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(
               <MapPin size={13} className="text-kuytu-accent" />
               {profile.location} · {profile.distanceKm} km
             </p>
+
+            <div className="mt-3">
+              <LifestyleBadges lifestyle={profile.lifestyle} max={3} />
+            </div>
+
+            {profile.prompts[0] && (
+              <div className="mt-3 rounded-b-2xl rounded-t-[1.25rem] border border-kuytu-border bg-kuytu-card-raised p-3">
+                <p className="text-[11px] font-bold uppercase tracking-wide text-kuytu-accent-deep">
+                  {profile.prompts[0].prompt}
+                </p>
+                <p className="mt-0.5 line-clamp-2 text-sm text-kuytu-text/85">
+                  {profile.prompts[0].answer}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </motion.div>

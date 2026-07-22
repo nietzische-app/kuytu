@@ -6,8 +6,29 @@ import {
   niyetToIntention,
 } from "../lib/mappers";
 import { FIRST_MOVE_WINDOW_MS } from "../lib/constants";
+import { computeCompletion } from "../lib/completion";
 
 const prisma = new PrismaClient();
+
+/** Deep-profile attributes per account, keyed by email. */
+type DeepProfile = {
+  jobTitle: string;
+  education: string;
+  height: number;
+  zodiac: string;
+  smoking: string;
+  alcohol: string;
+  pets: string;
+};
+const deepByEmail: Record<string, DeepProfile> = {
+  "demo@kuytu.app": { jobTitle: "Mimarlık", education: "Yüksek Lisans", height: 168, zodiac: "Terazi", smoking: "Kullanmıyorum", alcohol: "Sosyal İçici", pets: "Kedi Sahibi" },
+  "ahmet@kuytu.app": { jobTitle: "Öğretmen", education: "Lisans", height: 180, zodiac: "Başak", smoking: "Kullanmıyorum", alcohol: "Özel Günlerde", pets: "Köpek Sahibi" },
+  "cem@kuytu.app": { jobTitle: "Müzisyen", education: "Lisans", height: 178, zodiac: "Yay", smoking: "Sosyal İçici", alcohol: "Sosyal İçici", pets: "Hayvanları Çok Sever" },
+  "elif@kuytu.app": { jobTitle: "İç Mimar", education: "Lisans", height: 165, zodiac: "Kova", smoking: "Kullanmıyorum", alcohol: "Sosyal İçici", pets: "Kedi Sahibi" },
+  "murat@kuytu.app": { jobTitle: "Doktor", education: "Doktora", height: 182, zodiac: "Oğlak", smoking: "Kullanmıyorum", alcohol: "Özel Günlerde", pets: "Köpek Sahibi" },
+  "selin@kuytu.app": { jobTitle: "Yazar", education: "Yüksek Lisans", height: 170, zodiac: "Balık", smoking: "Sosyal İçici", alcohol: "Sosyal İçici", pets: "Hayvanları Çok Sever" },
+  "kemal@kuytu.app": { jobTitle: "Şef", education: "Ön Lisans", height: 176, zodiac: "Boğa", smoking: "Kullanıyorum", alcohol: "Özel Günlerde", pets: "Evcil Hayvanı Yok" },
+};
 
 /** Female demo account — the API's default "current user". */
 const DEMO_USER_EMAIL = "demo@kuytu.app";
@@ -120,8 +141,18 @@ async function main() {
       longitude: 29.028,
       interests: ["Sinema", "Yürüyüş", "Kahve"],
       prompts: [
-        { prompt: "Beni mutlu eden", answer: "İyi bir sohbet ve deniz." },
+        {
+          questionId: "ideal-sunday",
+          questionText: "İdeal bir Pazar sabahım...",
+          answerText: "Sahilde uzun bir yürüyüş ve iyi bir kahve.",
+        },
+        {
+          questionId: "daily-ritual",
+          questionText: "En çok keyif aldığım günlük ritüelim...",
+          answerText: "Akşam balkonda bir kitapla demlenmek.",
+        },
       ],
+      ...deepByEmail[DEMO_USER_EMAIL],
     },
   });
 
@@ -148,13 +179,16 @@ async function main() {
         longitude: meta.longitude,
         interests: p.interests,
         prompts: p.prompts as unknown as Prisma.InputJsonValue,
+        ...(deepByEmail[meta.email] ?? {}),
       },
     });
     byEmail.set(user.email, user);
   }
 
   for (const data of extraMen) {
-    const user = await prisma.user.create({ data });
+    const user = await prisma.user.create({
+      data: { ...data, ...(deepByEmail[data.email] ?? {}) },
+    });
     byEmail.set(user.email, user);
   }
 
@@ -228,6 +262,22 @@ async function main() {
           createdAt: new Date(now - 10 * 60_000), // after Deniz's last read
         },
       ],
+    });
+  }
+
+  // Recompute "Profil Doluluk Oranı" for every seeded user.
+  const all = await prisma.user.findMany();
+  for (const u of all) {
+    const prompts = Array.isArray(u.prompts)
+      ? (u.prompts as { answerText?: string; answer?: string }[]).map((p) => ({
+          answerText: p.answerText ?? p.answer ?? "",
+        }))
+      : [];
+    await prisma.user.update({
+      where: { id: u.id },
+      data: {
+        profileCompletion: computeCompletion({ ...u, prompts }),
+      },
     });
   }
 
